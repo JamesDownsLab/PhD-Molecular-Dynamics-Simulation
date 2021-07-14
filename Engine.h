@@ -43,6 +43,27 @@ private:
     /// Calculate forces and updates positions/velocities
     void integrate();
 
+    /////////////////////////////////////////////////////////////////////////////
+    /// Lattice
+    /////////////////////////////////////////////////////////////////////////////
+
+    /// 2D vector representing the lattice cells
+    /// Value contains -1 if empty or the index of the particle.
+    std::vector<std::vector<int>> pindex;
+
+    /// Vector containing a list of neighbours for each particle.
+    std::vector<std::vector<int>> partners;
+
+    /// Updates pindex and partners.
+    void make_ilist();
+
+    /// Checks if pindex will change.
+    bool ilist_needs_update();
+    void clear_pindex();
+    void init_lattice_algorithm();
+    double rmin, rmax, gk;
+    int gm, Nx, Ny;
+
     void dump();
 
     ///////////////////////////////////////////////////////////
@@ -61,6 +82,9 @@ private:
     double lx;
     double ly;
     double lz;
+    double x_0{0.0};
+    double y_0{0.0};
+    double z_0{0.0};
     double dimple_rad;
     double dimple_spacing;
     double dimple_depth;

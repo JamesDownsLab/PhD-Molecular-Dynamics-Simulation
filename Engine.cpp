@@ -7,6 +7,7 @@
 Engine::Engine(const char *fname, ProgramOptions options) : _options{options} {
     f1 = fopen(_options.savepath.string().c_str(), "w");
     init_system(fname);
+    init_lattice_algorithm();
 
 }
 
@@ -73,3 +74,105 @@ void Engine::dump() {
         std::fprintf(f1, "%.9f %.9f %.9f %.9f %.9f %.9f %.9f %d\n", p.x(), p.y(), p.z(), p.vx(), p.vy(), p.vz(), p.r(), 0);
     }
 }
+
+void Engine::step() {
+     // Check whether the optimiser needs updating
+     if (ilist_needs_update()) {make_ilist();}
+
+     integrate();
+}
+
+void Engine::integrate() {
+    // Set forces to zero
+    std::for_each(particles.begin(), particles.end(),
+                  [&](Particle& p){
+        p.set_force_to_zero();
+    });
+}
+
+///////////////////////////////////////////////////////////////////////////////
+/// Lattice Method
+///////////////////////////////////////////////////////////////////////////////
+
+void Engine::init_lattice_algorithm() {
+    rmin = particles[0].r();
+    rmax = particles[0].r();
+
+    // Calculate gk, the size of the lattice sites
+    gk = sqrt(2) * rmin;
+
+    // Calcualte gm, the number of lattice sites that the largest particle covers
+    gm = int(2*rmax/gk) + 1;
+
+    // calculate the numebr of lattice sites in each dimension
+    Nx = int(lx / gk) + 1;
+    Ny = int(ly / gk + 1);
+    partners.resize(no_of_particles);
+    pindex.resize(Nx);
+    for (auto& p : pindex){
+        p.resize(Ny);
+    }
+    clear_pindex();
+    make_ilist();
+}
+
+void Engine::make_ilist() {
+    // For each particle, add it to the pindex lattice site
+    // and clear its partners
+    for (unsigned int i{0}; i<no_of_particles; i++){
+        double x = particles[i].x();
+        double y = particles[i].y();
+        int ix = int((x-x_0) / gk);
+        int iy = int((y-y_0) / gk);
+        pindex[ix][iy] = i;
+        partners[i].clear();
+    }
+
+    // Generate the partners list for each particle
+    for (unsigned int i{ 0 }; i < no_of_particles; i++) {
+        double x = particles[i].x();
+        double y = particles[i].y();
+        if ((x >= x_0) && (x < x_0 + lx) && (y >= y_0) && (y < y_0 + ly)) {
+            int ix = int((x - x_0) / gk);
+            int iy = int((y - y_0) / gk);
+            // Check the adjacent gm lattice sites for particles
+            for (int dx = -gm; dx <= gm; dx++) {
+                for (int dy = -gm; dy <= gm; dy++) {
+                    int iix = (ix + dx + Nx) % Nx;
+                    int iiy = (iy + dy + Ny) % Ny;
+                    int k = pindex[iix][iiy];
+                    // Only record the particle once
+                    if (k > (int)i) {
+                        partners[i].push_back(k);
+                    }
+                }
+            }
+        }
+    }
+}
+
+bool Engine::ilist_needs_update() {
+    // If the pindex is the same as last time then it doesn't need updating
+    for (unsigned int i{ 0 }; i < no_of_particles; i++) {
+        double x = particles[i].x();
+        double y = particles[i].y();
+        int ix = int((x - x_0) / gk);
+        int iy = int((y - y_0) / gk);
+        if (pindex[ix][iy] != i) {
+            clear_pindex();
+            return true;
+        }
+    }
+    return false;
+}
+
+void Engine::clear_pindex()
+{
+    for (auto& p : pindex) {
+        for (auto& q : p) {
+            q = -1;
+        }
+    }
+}
+
+
