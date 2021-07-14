@@ -90,6 +90,7 @@ private:
     double dimple_depth;
     double base_height;
     double Time{0};
+    Vector G{0, 0, -9.81};
 };
 
 

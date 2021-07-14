@@ -8,9 +8,16 @@
 #include <iostream>
 #include "Vector.h"
 
+inline double normalize(double dx, double L) {
+    while (dx < -L / 2) dx += L;
+    while (dx >= L / 2) dx -= L;
+    return dx;
+}
+
 class Particle {
 
     friend std::istream& operator >> (std::istream& is, Particle& p);
+    friend void force(Particle& p1, Particle& p2, double lx, double ly, double lz);
 
 
 public:
@@ -49,8 +56,9 @@ public:
     void add_force(const Vector& f) {_force += f;}
     void periodic_bc(double x_0, double y_0, double lx, double ly);
     void boundary_conditions(double timestep, double Time);
+    void set_force_to_zero() { _force = null;}
 
-    void velocity_verlet(double dt);
+    void velocity_verlet(double dt, Vector G);
 
 private:
     Vector rtd0{null}, rtd1{null}, rtd2{null}, rtd3{null}, rtd4{null};

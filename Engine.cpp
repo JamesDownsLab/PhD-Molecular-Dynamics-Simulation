@@ -80,6 +80,8 @@ void Engine::step() {
      if (ilist_needs_update()) {make_ilist();}
 
      integrate();
+
+     dump();
 }
 
 void Engine::integrate() {
@@ -88,7 +90,19 @@ void Engine::integrate() {
                   [&](Particle& p){
         p.set_force_to_zero();
     });
+
+    // Calculate all the forces between particles
+    make_forces();
+
+    // Update  the positions of all the particles
+    std::for_each(particles.begin(), particles.end(),
+                  [&](Particle& p){
+        p.velocity_verlet(timestep, G);
+    });
 }
+
+
+
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Lattice Method
@@ -171,6 +185,16 @@ void Engine::clear_pindex()
     for (auto& p : pindex) {
         for (auto& q : p) {
             q = -1;
+        }
+    }
+}
+
+void Engine::make_forces() {
+    // Loop over the partners list for each particle
+    for (unsigned int i{ 0 }; i < no_of_particles; i++) {
+        for (unsigned int k{ 0 }; k < partners[i].size(); k++) {
+            int pk = partners[i][k];
+            force(particles[i], particles[pk], lx, ly, lz);
         }
     }
 }
