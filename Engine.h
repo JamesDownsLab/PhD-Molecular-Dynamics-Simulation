@@ -10,6 +10,7 @@
 #include <filesystem>
 #include <vector>
 #include "Particle.h"
+#include "BasePlate.h"
 
 namespace fs = std::filesystem;
 
@@ -28,7 +29,7 @@ public:
      * \param fname Filename of initialisation data
      * \param options Struct containing various options for the program
      */
-     Engine(const char* fname, ProgramOptions options);
+     Engine(const char* fname, ProgramOptions& options);
 
      ///Iterates the simulation by one timestep
      void step();
@@ -61,15 +62,15 @@ private:
     bool ilist_needs_update();
     void clear_pindex();
     void init_lattice_algorithm();
-    double rmin, rmax, gk;
-    int gm, Nx, Ny;
+    double rmin{0}, rmax{0}, gk{0};
+    int gm{0}, Nx{0}, Ny{0};
 
     void dump();
 
     ///////////////////////////////////////////////////////////
     /// Particle data
     //////////////////////////////////////////////////////////
-    size_t no_of_particles;
+    size_t no_of_particles{0};
     std::vector<Particle> particles;
     ProgramOptions _options;
 
@@ -78,19 +79,23 @@ private:
     /////////////////////////////////////////////////////////
     std::FILE* f1;
 
-    double timestep;
-    double lx;
-    double ly;
-    double lz;
+    double timestep{0};
+    double lx{0};
+    double ly{0};
+    double lz{0};
     double x_0{0.0};
     double y_0{0.0};
     double z_0{0.0};
-    double dimple_rad;
-    double dimple_spacing;
-    double dimple_depth;
-    double base_height;
+    double dimple_rad{0};
+    double dimple_spacing{0};
+    double dimple_depth{0};
+    double base_height{0};
+    double _base_amplitude{0};
+    double _base_period{0};
     double Time{0};
     Vector G{0, 0, -9.81};
+    BasePlate basePlate{0, 0, 0};
+
 };
 
 

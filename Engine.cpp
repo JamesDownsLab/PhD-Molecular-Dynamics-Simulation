@@ -4,11 +4,11 @@
 
 #include "Engine.h"
 
-Engine::Engine(const char *fname, ProgramOptions options) : _options{options} {
+Engine::Engine(const char *fname, ProgramOptions& options)
+        : _options{options} {
     f1 = fopen(_options.savepath.string().c_str(), "w");
     init_system(fname);
     init_lattice_algorithm();
-
 }
 
 void Engine::init_system(const char *fname) {
@@ -79,6 +79,8 @@ void Engine::step() {
      // Check whether the optimiser needs updating
      if (ilist_needs_update()) {make_ilist();}
 
+     update_base_plate();
+
      integrate();
 
      dump();
@@ -93,6 +95,9 @@ void Engine::integrate() {
 
     // Calculate all the forces between particles
     make_forces();
+
+    // Calculate all the forces between the particles and the plate
+    make_plate_forces();
 
     // Update  the positions of all the particles
     std::for_each(particles.begin(), particles.end(),
