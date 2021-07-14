@@ -18,6 +18,7 @@ const double SQRT3 = sqrt(3);
 
 struct ProgramOptions {
     fs::path savepath;
+    int save_interval;
 };
 
 class Engine {
@@ -71,6 +72,8 @@ private:
     int gm{0}, Nx{0}, Ny{0};
 
     void dump();
+    void check_dump();
+    int save{1};
 
     ///////////////////////////////////////////////////////////
     /// Particle data

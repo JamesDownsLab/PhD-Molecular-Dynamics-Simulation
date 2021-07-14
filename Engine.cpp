@@ -66,6 +66,8 @@ void Engine::init_system(const char *fname) {
 }
 
 void Engine::dump() {
+    std::cout << "Dump at Time : " << Time << " s" << std::endl;
+
     std::fprintf(f1, "ITEM: TIMESTEP\n%d\n", int(Time / timestep));
     std::fprintf(f1, "ITEM: TIME\n%.8f\n", Time);
     std::fprintf(f1, "ITEM: BOX BOUNDS pp pp f\n%.4f %.4f\n%.4f %.4f\n%.4f %.4f\n", 0.0, lx, 0.0, ly, 0.0, lz);
@@ -84,7 +86,7 @@ void Engine::step() {
 
      integrate();
 
-     dump();
+     check_dump();
 }
 
 void Engine::integrate() {
@@ -212,8 +214,18 @@ void Engine::make_forces() {
 }
 
 void Engine::make_plate_forces() {
-    for (unsigned  int i{0}; i < no_of_particles; i++){
+    for (unsigned int i{0}; i < no_of_particles; i++){
         force(particles[i], basePlate);
+    }
+}
+
+void Engine::check_dump() {
+    if (save != _options.save_interval) {
+        save++;
+    }
+    else {
+        save = 1;
+        dump();
     }
 }
 

@@ -98,7 +98,7 @@ std::vector<std::pair<double, double>> set_area_fraction(auto& points, double ar
 void setup_experiment(double area_fraction) {
     std::ofstream fout("initial.data");
     SystemProperties props {
-        1e-6,
+        1e-5,
         0.3,
         0.3,
         0.1,
@@ -116,7 +116,7 @@ void setup_experiment(double area_fraction) {
 
     std::vector<std::pair<double, double>> new_xy_points = set_area_fraction(xy_points, number_fraction);
 
-    double z = 4e-3;
+    double z = 3.1e-3;
     for (std::pair<double, double> p: new_xy_points){
         dump(fout, p.first, p.second, z, ballProps);
     }

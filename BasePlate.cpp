@@ -5,6 +5,6 @@
 #include "BasePlate.h"
 
 void BasePlate::update(double Time) {
-    _z = _A * sin(_omega * Time);
+    _z = _A * sin(_omega * Time) + _z0;
     _vz = _A * _omega * cos(_omega * Time);
 }

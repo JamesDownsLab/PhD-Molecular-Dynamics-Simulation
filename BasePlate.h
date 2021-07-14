@@ -10,11 +10,11 @@
 
 class BasePlate {
 public:
-    BasePlate(double z, double A, double T): _z(z), _A(A), _T(T){}
+    BasePlate(double z, double A, double T): _z0(z), _A(A), _T(T){}
 
     void update(double Time);
 
-    void set_zi(double z) {_z = z;}
+    void set_zi(double z) {_z0 = z;}
     void set_A(double A) {_A = A;}
     void set_T(double T) {_T = T; _omega=2*M_PI/T;}
 
@@ -26,6 +26,7 @@ public:
 
 
 private:
+    double _z0{0};
     double _z{0};
     double _vz{0};
     double _A{0};
