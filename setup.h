@@ -13,6 +13,7 @@ struct SystemProperties {
     double dimple_rad;
     double dimple_spacing;
     double dimple_depth;
+    double base_height;
 };
 
 struct MaterialProperties {
@@ -48,13 +49,14 @@ void dump(
 
 void dump_preamble(std::ofstream& os, SystemProperties& p) {
     os.precision(10);
-    os << "#timestep" << p.timestep << "\n"
+    os << "#timestep: " << p.timestep << "\n"
         << "#lx: " << p.lx << "\n"
         << "#ly: " << p.ly << "\n"
         << "#lz: " << p.lz << "\n"
         << "#dimple_rad: " << p.dimple_rad << "\n"
         << "#dimple_spacing: " << p.dimple_spacing << "\n"
-        << "#dimple_depth: " << p.dimple_depth << "\n";
+        << "#dimple_depth: " << p.dimple_depth << "\n"
+        << "#base_height: " << p.base_height << "\n";
 }
 
 std::vector<std::pair<double, double>> create_lattice(double lx, double ly, double L){
@@ -85,7 +87,8 @@ void setup_experiment(double area_fraction) {
         0.1,
         1e-3,
         4.8e-3,
-        2e-4
+        2e-4,
+        1e-3
     };
 
     dump_preamble(fout, props);

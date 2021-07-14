@@ -7,6 +7,6 @@ int main() {
         "data.dump"
     };
     setup_experiment(0.8);
-//    Engine engine("initial.data", options);
+    Engine engine("initial.data", options);
 
 }

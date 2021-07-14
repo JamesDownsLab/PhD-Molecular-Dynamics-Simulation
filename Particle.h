@@ -10,6 +10,9 @@
 
 class Particle {
 
+    friend std::istream& operator >> (std::istream& is, Particle& p);
+
+
 public:
     Particle() : rtd0(null), rtd1(null), rtd2(null), rtd3(null), rtd4(null) {}
     Particle(const Particle& rhs) = default;
@@ -50,10 +53,10 @@ public:
     void velocity_verlet(double dt);
 
 private:
-    Vector rtd0, rtd1, rtd2, rtd3, rtd4;
+    Vector rtd0{null}, rtd1{null}, rtd2{null}, rtd3{null}, rtd4{null};
     Vector rtd0_old, rtd0_new;
     Vector _force;
-    double _r, _m;
+    double _r, _m, _youngs_modulus, _poisson, _coeff_res, _coeff_fric;
 };
 
 

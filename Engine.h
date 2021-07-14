@@ -57,6 +57,14 @@ private:
     /////////////////////////////////////////////////////////
     std::FILE* f1;
 
+    double timestep;
+    double lx;
+    double ly;
+    double lz;
+    double dimple_rad;
+    double dimple_spacing;
+    double dimple_depth;
+    double base_height;
 };
 
 
