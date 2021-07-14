@@ -55,7 +55,6 @@ public:
     ///////////////////////////////////////
     void add_force(const Vector& f) {_force += f;}
     void periodic_bc(double x_0, double y_0, double lx, double ly);
-    void boundary_conditions(double timestep, double Time);
     void set_force_to_zero() { _force = null;}
 
     void velocity_verlet(double dt, Vector G);

@@ -99,6 +99,12 @@ void Engine::integrate() {
                   [&](Particle& p){
         p.velocity_verlet(timestep, G);
     });
+
+    // Apply periodic boundary conditions
+    std::for_each(particles.begin(), particles.end(),
+                  [&](Particle& p) {p.periodic_bc(x_0, y_0, lx, ly);});
+
+    Time += timestep;
 }
 
 

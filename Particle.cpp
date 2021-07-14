@@ -68,3 +68,10 @@ void force(Particle &p1, Particle &p2, double lx, double ly, double lz) {
         }
     }
 }
+
+void Particle::periodic_bc(double x_0, double y_0, double lx, double ly) {
+    while (rtd0.x() < x_0) rtd0.x() += lx;
+    while (rtd0.x() > x_0 + lx) rtd0.x() -= lx;
+    while (rtd0.y() < y_0) rtd0.y() += ly;
+    while (rtd0.y() > y_0 + ly) rtd0.y() -= ly;
+}
