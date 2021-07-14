@@ -25,7 +25,7 @@ void force(Particle &p1, Particle &p2, double lx, double ly, double lz) {
     double dx = normalize(p1.x() - p2.x(), lx);
     double dy = normalize(p1.y() - p2.y(), ly);
     double dz = normalize(p1.z() - p2.z(), lz);
-    if (abs(dx) < p1.r() + p2.r() && abs(dy) < p1.r() + p2.r() && abs(dz) < p1.r() + p2.r()){
+    if (std::abs(dx) < p1.r() + p2.r() && std::abs(dy) < p1.r() + p2.r() && std::abs(dz) < p1.r() + p2.r()){
         double rr = sqrt(dx*dx + dy*dy + dz*dz);
         double r1 = p1.r();
         double r2 = p2.r();
