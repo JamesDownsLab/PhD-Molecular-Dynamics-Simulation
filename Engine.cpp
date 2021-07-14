@@ -79,7 +79,7 @@ void Engine::step() {
      // Check whether the optimiser needs updating
      if (ilist_needs_update()) {make_ilist();}
 
-     update_base_plate();
+     basePlate.update(Time);
 
      integrate();
 
@@ -97,7 +97,7 @@ void Engine::integrate() {
     make_forces();
 
     // Calculate all the forces between the particles and the plate
-    make_plate_forces();
+    //make_plate_forces();
 
     // Update  the positions of all the particles
     std::for_each(particles.begin(), particles.end(),

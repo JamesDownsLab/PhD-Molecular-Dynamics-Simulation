@@ -8,5 +8,8 @@ int main() {
     };
     setup_experiment(0.8);
     Engine engine("initial.data", options);
-    engine.step();
+    for (int s{0}; s<1000; s++){
+        engine.step();
+    }
+
 }
