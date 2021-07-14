@@ -9,6 +9,7 @@ Engine::Engine(const char *fname, ProgramOptions& options)
     f1 = fopen(_options.savepath.string().c_str(), "w");
     init_system(fname);
     init_lattice_algorithm();
+    basePlate.set_zi(base_height);
 }
 
 void Engine::init_system(const char *fname) {
@@ -97,7 +98,7 @@ void Engine::integrate() {
     make_forces();
 
     // Calculate all the forces between the particles and the plate
-    //make_plate_forces();
+    make_plate_forces();
 
     // Update  the positions of all the particles
     std::for_each(particles.begin(), particles.end(),
@@ -207,6 +208,12 @@ void Engine::make_forces() {
             int pk = partners[i][k];
             force(particles[i], particles[pk], lx, ly, lz);
         }
+    }
+}
+
+void Engine::make_plate_forces() {
+    for (unsigned  int i{0}; i < no_of_particles; i++){
+        force(particles[i], basePlate);
     }
 }
 

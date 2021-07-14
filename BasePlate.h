@@ -18,6 +18,11 @@ public:
     void set_A(double A) {_A = A;}
     void set_T(double T) {_T = T; _omega=2*M_PI/T;}
 
+    double& z() {return _z;}
+    double z() const {return _z;}
+
+    double& vz() {return _vz;}
+    double vz() const {return _vz;}
 
 
 private:

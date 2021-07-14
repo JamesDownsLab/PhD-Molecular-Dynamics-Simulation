@@ -75,3 +75,27 @@ void Particle::periodic_bc(double x_0, double y_0, double lx, double ly) {
     while (rtd0.y() < y_0) rtd0.y() += ly;
     while (rtd0.y() > y_0 + ly) rtd0.y() -= ly;
 }
+
+void force(Particle &p, BasePlate &basePlate) {
+    double dz = p.z() - basePlate.z();
+
+    // Overlap
+    double xi = p.r() - dz;
+    if (xi > 0){ // Overlapping
+
+        // Relative velocities
+        double xidot = p.vz() - basePlate.vz();
+
+        double GShear = p._youngs_modulus/(2*(1+p._poisson));
+        double kn = 4.0 * GShear / (3*(1-p._poisson));
+        double a = pow(-2.0 * log(p._coeff_res) / M_PI, 2);
+        double gamma_n = sqrt(a*2*kn/p.m()/(1+0.25*a));
+
+        double elastic_force = kn * xi;
+        double dissipative_force = gamma_n * xidot;
+        double fn = elastic_force + dissipative_force;
+
+        if (fn < 0) fn = 0;
+        p.add_force(Vector(0, 0, fn));
+    }
+}

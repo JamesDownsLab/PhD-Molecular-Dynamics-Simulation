@@ -34,12 +34,17 @@ public:
      ///Iterates the simulation by one timestep
      void step();
 
+     void set_baseplate(double A, double T){basePlate.set_A(A); basePlate.set_T(T);}
+
 private:
     /// Setup the system
     void init_system(const char* fname);
 
     /// Calculate the collisional forces between all particles
     void make_forces();
+
+    /// Calculate the forces with the base
+    void make_plate_forces();
 
     /// Calculate forces and updates positions/velocities
     void integrate();

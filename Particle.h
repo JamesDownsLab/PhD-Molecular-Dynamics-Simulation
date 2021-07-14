@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include "Vector.h"
+#include "BasePlate.h"
 
 inline double normalize(double dx, double L) {
     while (dx < -L / 2) dx += L;
@@ -18,6 +19,7 @@ class Particle {
 
     friend std::istream& operator >> (std::istream& is, Particle& p);
     friend void force(Particle& p1, Particle& p2, double lx, double ly, double lz);
+    friend void force(Particle& p, BasePlate& basePlate);
 
 
 public:
