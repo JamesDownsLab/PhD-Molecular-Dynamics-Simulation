@@ -8,5 +8,4 @@ int main() {
     };
     setup_experiment(0.8);
     Engine engine("initial.data", options);
-
 }

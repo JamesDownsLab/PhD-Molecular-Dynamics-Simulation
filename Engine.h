@@ -65,6 +65,7 @@ private:
     double dimple_spacing;
     double dimple_depth;
     double base_height;
+    double Time{0};
 };
 
 
