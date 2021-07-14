@@ -5,6 +5,8 @@
 #ifndef INC_3DMOLECULARDYNAMICS_SETUP_H
 #define INC_3DMOLECULARDYNAMICS_SETUP_H
 
+#include <random>
+
 struct SystemProperties {
     double timestep;
     double lx;
@@ -78,6 +80,21 @@ std::vector<std::pair<double, double>> create_lattice(double lx, double ly, doub
     return points;
 }
 
+std::vector<std::pair<double, double>> set_area_fraction(auto& points, double area_fraction){
+    std::random_device rd;
+    std::default_random_engine eng(rd());
+    std::uniform_real_distribution<> distr(0.0, 1.0);
+    std::vector<std::pair<double, double>> new_points;
+    size_t L = points.size();
+    for (size_t i = 0; i<L; i++){
+        double rnd = distr(eng);
+        if (rnd < area_fraction) {
+            new_points.push_back(points[i]);
+        }
+    }
+    return new_points;
+}
+
 void setup_experiment(double area_fraction) {
     std::ofstream fout("initial.data");
     SystemProperties props {
@@ -94,8 +111,13 @@ void setup_experiment(double area_fraction) {
     dump_preamble(fout, props);
     /// Fill the system
     std::vector<std::pair<double, double>> xy_points = create_lattice(props.lx, props.ly, 4e-3);
+
+    double number_fraction = area_fraction * xy_points.size()*ballProps.radius*ballProps.radius*3.141/(props.lx*props.ly);
+
+    std::vector<std::pair<double, double>> new_xy_points = set_area_fraction(xy_points, number_fraction);
+
     double z = 4e-3;
-    for (std::pair<double, double> p: xy_points){
+    for (std::pair<double, double> p: new_xy_points){
         dump(fout, p.first, p.second, z, ballProps);
     }
 
