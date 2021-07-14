@@ -1,6 +1,11 @@
 #include <iostream>
+#include "Engine.h"
+
 
 int main() {
-    std::cout << "Hello, World!" << std::endl;
-    return 0;
+    ProgramOptions options{
+        "data.dump"
+    };
+    Engine engine("initial.data", options);
+
 }

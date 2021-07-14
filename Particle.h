@@ -18,6 +18,9 @@ public:
     Particle& operator=(Particle && rhs) = default;
     virtual ~Particle() = default;
 
+    ///////////////////////////////////////
+    /// Getters
+    ///////////////////////////////////////
     double& r() { return _r; }
     double r() const { return _r; }
     double m() const { return _m; }
@@ -34,9 +37,17 @@ public:
     double vy() const { return rtd1.y(); }
     double& vz() { return rtd1.z(); }
     double vz() const { return rtd1.z(); }
-
     Vector& force() {return _force;}
     Vector force() const {return _force;}
+
+    ///////////////////////////////////////
+    /// Setters
+    ///////////////////////////////////////
+    void add_force(const Vector& f) {_force += f;}
+    void periodic_bc(double x_0, double y_0, double lx, double ly);
+    void boundary_conditions(double timestep, double Time);
+
+    void velocity_verlet(double dt);
 
 private:
     Vector rtd0, rtd1, rtd2, rtd3, rtd4;

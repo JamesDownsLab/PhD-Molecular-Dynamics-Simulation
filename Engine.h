@@ -9,6 +9,7 @@
 #include <fstream>
 #include <filesystem>
 #include <vector>
+#include "Particle.h"
 
 namespace fs = std::filesystem;
 
@@ -49,6 +50,12 @@ private:
     //////////////////////////////////////////////////////////
     size_t no_of_particles;
     std::vector<Particle> particles;
+    ProgramOptions _options;
+
+    /////////////////////////////////////////////////////////
+    /// File Writing
+    /////////////////////////////////////////////////////////
+    std::FILE* f1;
 
 };
 
