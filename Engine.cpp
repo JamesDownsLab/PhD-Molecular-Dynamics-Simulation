@@ -255,12 +255,19 @@ void Engine::add_particles() {
     double dy = 2*ball_rad*sqrt(3.0)/2.0;
     int nx = floor(lx / dx);
     int ny = floor(ly / dy);
+
+    std::random_device rd;
+    std::default_random_engine eng(rd());
+    std::uniform_real_distribution<> distr(0.0, 1.0);
+
     for (int i{0}; i < nx; i++){
         for (int j{0}; j < ny; j++){
             double x = double(i)*dx + double(j%2)*dx/2.0;
             double y = double(j)*dy;
             Particle pp(x, y, ball_height, ball_rad);
-            particles.push_back(pp);
+            if (distr(eng) < area_fraction) {
+                particles.push_back(pp);
+            }
         }
     }
 }
