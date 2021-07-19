@@ -84,8 +84,16 @@ void force(Particle &p, BasePlate &basePlate, double force_constant) {
         double dissipative_force = force_constant * p._damping_constant*xidot*sqrt_xi/2;
         double fn = elastic_force + dissipative_force;
 
+        double theta = (float) std::rand()/RAND_MAX*M_PI/20 - M_PI/40;
+        double phi = (float) std::rand() / RAND_MAX*M_PI/20 - M_PI/40;
+        double ex = sin(theta);
+        double ey = sin(phi);
+        double ez = cos(theta)*cos(phi);
+
+
+
         if (fn > 0) {
-            p.add_force(Vector(0, 0, fn));
+            p.add_force(Vector(ex*fn, ey*fn, ez*fn));
         }
     }
 }
