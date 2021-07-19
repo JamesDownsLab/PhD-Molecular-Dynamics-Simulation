@@ -78,9 +78,10 @@ void force(Particle &p, BasePlate &basePlate, double force_constant) {
     // Overlap
     double xi = p.r() - dz;
     if (xi > 0){ // Overlapping
+        double sqrt_xi = sqrt(xi);
         double xidot = -(p.vz() - basePlate.vz());
-        double elastic_force = force_constant * pow(xi, 1.5);
-        double dissipative_force = force_constant * p._damping_constant*xidot*sqrt(xi)/2;
+        double elastic_force = force_constant * sqrt_xi * xi;
+        double dissipative_force = force_constant * p._damping_constant*xidot*sqrt_xi/2;
         double fn = elastic_force + dissipative_force;
 
         if (fn > 0) {
