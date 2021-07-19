@@ -173,17 +173,12 @@ void Engine::make_forces() {
 
 void Engine::make_plate_forces() {
     for (auto p: particles){
-        std::vector<double> query_pt{p.x(), p.y()};
-        const size_t num_results = 5;
-        std::vector<size_t> ret_indexes(num_results);
-        std::vector<double> out_dists_sqr(num_results);
-        nanoflann::KNNResultSet<double> resultSet(num_results);
-
-        resultSet.init(&ret_indexes[0], &out_dists_sqr[0]);
-        tree->index->findNeighbors(resultSet, &query_pt[0], nanoflann::SearchParams(10));
-
-        std::cout << ret_indexes[0] << std::endl;
-        force(p, basePlate, ball_base_normal_constant);
+        const double query_pt[2] = {p.x(), p.y()};
+        const double search_radius = p.r();
+        std::vector<std::pair<size_t,double>> ret_matches;
+        nanoflann::SearchParams params;
+        const size_t nMatches = tree->index->radiusSearch(&query_pt[0], search_radius, ret_matches, params);
+        std::cout << "nMatches = " << nMatches << std::endl;
     }
 }
 
@@ -310,5 +305,3 @@ my_kd_tree_t* Engine::make_tree() {
     return mat_index;
 
 }
-
-
