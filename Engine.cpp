@@ -7,7 +7,8 @@
 Engine::Engine(const char *fname, ProgramOptions& options)
         : _options{options} {
     f1 = fopen(_options.savepath.string().c_str(), "w");
-    init_system(fname);
+    read_system_params("params.txt");
+    init_system();
     init_lattice_algorithm();
     basePlate.set_zi(base_height);
     ball_base_normal_constant =
@@ -15,68 +16,9 @@ Engine::Engine(const char *fname, ProgramOptions& options)
                     (1/((1-ball_poisson*ball_poisson)/ball_youngs + (1-base_poisson*base_poisson)/base_youngs));
 }
 
-void Engine::init_system(const char *fname) {
-    std::ifstream fparticle{fname};
-
-    // Read the system properties
-    while (fparticle.peek() == '#'){
-        std::string type;
-        fparticle >> type;
-
-        if (type == "#timestep:"){
-            fparticle >> timestep;
-        }
-        else if (type == "#lx:"){
-            fparticle >> lx;
-        }
-        else if (type == "#ly:"){
-            fparticle >> ly;
-        }
-        else if (type == "#lz:"){
-            fparticle >> lz;
-        }
-        else if (type == "#dimple_rad:"){
-            fparticle >> dimple_rad;
-        }
-        else if (type == "#dimple_spacing:"){
-            fparticle >> dimple_spacing;
-        }
-        else if (type == "#dimple_depth:"){
-            fparticle >> dimple_depth;
-        }
-        else if (type == "#base_height:"){
-            fparticle >> base_height;
-        }
-        else if (type == "#ball_youngs:"){
-            fparticle >> ball_youngs;
-        }
-        else if (type == "#ball_poisson:"){
-            fparticle >> ball_poisson;
-        }
-        else if (type == "#base_youngs:"){
-            fparticle >> base_youngs;
-        }
-        else if (type == "#base_poisson:"){
-            fparticle >> base_poisson;
-        }
-        else {
-            std::cout << "Unknown type: " << type << std::endl;
-        }
-        fparticle.ignore(100, '\n');
-    }
-
-    // Read the particles
-    while (fparticle){
-        Particle pp;
-        fparticle >> pp;
-        if (fparticle) {
-            particles.push_back(pp);
-        }
-    }
-
-    no_of_particles = particles.size();
-    std::cout << no_of_particles << " particles read" << std::endl;
-
+void Engine::init_system() {
+    add_particles();
+    add_base_particles();
     dump();
 }
 
@@ -241,6 +183,100 @@ void Engine::check_dump() {
     else {
         save = 1;
         dump();
+    }
+}
+
+void Engine::read_system_params(const char *fname) {
+
+    std::ifstream fparticle{fname};
+    // Read the system properties
+    while (fparticle.peek() == '#'){
+        std::string type;
+        fparticle >> type;
+
+        if (type == "#timestep:"){
+            fparticle >> timestep;
+        }
+        else if (type == "#lx:"){
+            fparticle >> lx;
+        }
+        else if (type == "#ly:"){
+            fparticle >> ly;
+        }
+        else if (type == "#lz:"){
+            fparticle >> lz;
+        }
+        else if (type == "#dimple_rad:"){
+            fparticle >> dimple_rad;
+        }
+        else if (type == "#dimple_spacing:"){
+            fparticle >> dimple_spacing;
+        }
+        else if (type == "#dimple_depth:"){
+            fparticle >> dimple_depth;
+        }
+        else if (type == "#base_height:"){
+            fparticle >> base_height;
+        }
+        else if (type == "#ball_youngs:"){
+            fparticle >> ball_youngs;
+        }
+        else if (type == "#ball_poisson:"){
+            fparticle >> ball_poisson;
+        }
+        else if (type == "#base_youngs:"){
+            fparticle >> base_youngs;
+        }
+        else if (type == "#base_poisson:"){
+            fparticle >> base_poisson;
+        }
+        else if(type == "#ball_rad:"){
+            fparticle >> ball_rad;
+        }
+        else if (type == "#base_rad:"){
+            fparticle >> base_rad;
+        }
+        else if (type == "#area_fraction:"){
+            fparticle >> area_fraction;
+        }
+        else if (type == "#ball_height:"){
+            fparticle >> ball_height;
+        }
+        else {
+            std::cout << "Unknown type: " << type << std::endl;
+        }
+        fparticle.ignore(100, '\n');
+    }
+
+}
+
+void Engine::add_particles() {
+    double dx = 2*ball_rad;
+    double dy = 2*ball_rad*sqrt(3.0)/2.0;
+    int nx = floor(lx / dx);
+    int ny = floor(ly / dy);
+    for (int i{0}; i < nx; i++){
+        for (int j{0}; j < ny; j++){
+            double x = double(i)*dx + double(j%2)*dx/2.0;
+            double y = double(j)*dy;
+            Particle pp(x, y, ball_height, ball_rad);
+            particles.push_back(pp);
+        }
+    }
+}
+
+void Engine::add_base_particles() {
+    double dx = 2*base_rad;
+    double dy = 2*base_rad*sqrt(3.0)/2.0;
+    int nx = floor(lx / dx);
+    int ny = floor(ly / dy);
+    for (int i{0}; i < nx; i++){
+        for (int j{0}; j < ny; j++){
+            double x = double(i)*dx + double(j%2)*dx/2.0;
+            double y = double(j)*dy;
+            Particle pp(x, y, base_height, base_rad);
+            base_particles.push_back(pp);
+        }
     }
 }
 

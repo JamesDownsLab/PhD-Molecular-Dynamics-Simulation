@@ -39,7 +39,14 @@ public:
 
 private:
     /// Setup the system
-    void init_system(const char* fname);
+
+    void read_system_params(const char* fname);
+
+    void init_system();
+
+    void add_particles();
+
+    void add_base_particles();
 
     /// Calculate the collisional forces between all particles
     void make_forces();
@@ -80,6 +87,7 @@ private:
     //////////////////////////////////////////////////////////
     size_t no_of_particles{0};
     std::vector<Particle> particles;
+    std::vector<Particle> base_particles;
     ProgramOptions _options;
 
     /////////////////////////////////////////////////////////
@@ -98,12 +106,15 @@ private:
     double dimple_spacing{0};
     double dimple_depth{0};
     double base_height{0};
-
+    double ball_rad{0};
+    double base_rad{0};
+    double ball_height{0};
     double ball_youngs{0};
     double ball_poisson{0};
     double base_youngs{0};
     double base_poisson{0};
     double ball_base_normal_constant{0};
+    double area_fraction{0};
 
     double _base_amplitude{0};
     double _base_period{0};

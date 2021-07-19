@@ -107,22 +107,6 @@ std::vector<std::pair<double, double>> set_area_fraction(auto& points, double ar
 
 void setup_experiment(double area_fraction) {
     std::ofstream fout("initial.data");
-    SystemProperties props {
-        1e-5,
-        0.04,
-        0.04,
-        0.1,
-        1e-3,
-        4.8e-3,
-        2e-4,
-        1e-3,
-        4e3,
-        0.48,
-        5e8,
-        0.3,
-    };
-
-    dump_preamble(fout, props);
     /// Fill the system
     std::vector<std::pair<double, double>> xy_points = create_lattice(props.lx, props.ly, 4e-3);
 

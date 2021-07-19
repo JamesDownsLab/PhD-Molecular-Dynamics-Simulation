@@ -23,7 +23,7 @@ class Particle {
 
 
 public:
-    Particle() : rtd0(null), rtd1(null), rtd2(null), rtd3(null), rtd4(null) {}
+    Particle(double x, double y, double z, double r) : rtd0(x, y, z), rtd1(null), rtd2(null), rtd3(null), rtd4(null), _r(r){}
     Particle(const Particle& rhs) = default;
     Particle(Particle && rhs) = default;
     Particle& operator=(const Particle & rhs) = default;
