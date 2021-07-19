@@ -72,28 +72,42 @@ void Particle::periodic_bc(double x_0, double y_0, double lx, double ly) {
     while (rtd0.y() > y_0 + ly) rtd0.y() -= ly;
 }
 
-void force(Particle &p, BasePlate &basePlate, double force_constant) {
+void force(Particle &p, Particle &b, BasePlate &basePlate, double force_constant) {
+    double dx = p.x() - b.x();
+    double dy = p.y() - b.y();
     double dz = p.z() - basePlate.z();
+    if (std::abs(dx) < p.r() + b.r() && std::abs(dy) < p.r() + b.r() && std::abs(dz) < p.r() + b.r()) {
+        double rr = sqrt(dx*dx + dy*dy + dz*dz);
+        double r1 = p.r();
+        double r2 = b.r();
 
-    // Overlap
-    double xi = p.r() - dz;
-    if (xi > 0){ // Overlapping
-        double sqrt_xi = sqrt(xi);
-        double xidot = -(p.vz() - basePlate.vz());
-        double elastic_force = force_constant * sqrt_xi * xi;
-        double dissipative_force = force_constant * p._damping_constant*xidot*sqrt_xi/2;
-        double fn = elastic_force + dissipative_force;
+        // Overlap
+        double xi = r1 + r2 - rr;
+        if (xi > 0) {
+            double sqrt_xi = sqrt(xi);
+            double rr_rez = 1 / rr;
 
-        double theta = (float) std::rand()/RAND_MAX*M_PI/20 - M_PI/40;
-        double phi = (float) std::rand() / RAND_MAX*M_PI/20 - M_PI/40;
-        double ex = sin(theta);
-        double ey = sin(phi);
-        double ez = cos(theta)*cos(phi);
+            // Unit vectors
+            double ex = dx * rr_rez;
+            double ey = dy * rr_rez;
+            double ez = dz * rr_rez;
+
+            // Relative velocities
+            double dvx = p.vx();
+            double dvy = p.vy();
+            double dvz = p.vz() - basePlate.vz();
+
+            // Overlap rate
+            double xidot = -(ex * dvx + ey * dvy + ez*dvz);
+
+            double elastic_force = force_constant * sqrt_xi * xi;
+            double dissipative_force = force_constant * p._damping_constant * xidot * sqrt_xi / 2;
+            double fn = elastic_force + dissipative_force;
 
 
-
-        if (fn > 0) {
-            p.add_force(Vector(ex*fn, ey*fn, ez*fn));
+            if (fn > 0) {
+                p.add_force(Vector(ex * fn, ey * fn, ez * fn));
+            }
         }
     }
 }

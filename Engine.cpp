@@ -184,6 +184,10 @@ void Engine::make_plate_forces() {
         std::vector<std::pair<size_t,double>> ret_matches;
         nanoflann::SearchParams params;
         const size_t nMatches = tree->index->radiusSearch(&query_pt[0], search_radius, ret_matches, params);
+        for (size_t i{0}; i<nMatches; i++){
+            size_t n = ret_matches.at(i).first;
+            force(p, base_particles.at(n), basePlate, ball_base_normal_constant);
+        }
     }
 }
 
