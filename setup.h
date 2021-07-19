@@ -16,6 +16,12 @@ struct SystemProperties {
     double dimple_spacing;
     double dimple_depth;
     double base_height;
+    double ball_young;
+    double ball_poisson;
+    double ball_damping;
+    double base_young;
+    double base_poisson;
+    double base_damping;
 };
 
 struct MaterialProperties {
@@ -58,7 +64,13 @@ void dump_preamble(std::ofstream& os, SystemProperties& p) {
         << "#dimple_rad: " << p.dimple_rad << "\n"
         << "#dimple_spacing: " << p.dimple_spacing << "\n"
         << "#dimple_depth: " << p.dimple_depth << "\n"
-        << "#base_height: " << p.base_height << "\n";
+        << "#base_height: " << p.base_height << "\n"
+        << "#ball_youngs: " << p.ball_young << "\n"
+        << "#ball_poisson: " << p.ball_poisson << "\n"
+        << "#ball_damping: " << p.ball_damping << "\n"
+        << "#base_youngs: " << p.base_young << "\n"
+        << "#base_poisson " << p.base_poisson << "\n"
+        << "#base_damping " << p.base_damping << "\n";
 }
 
 std::vector<std::pair<double, double>> create_lattice(double lx, double ly, double L){
@@ -98,14 +110,20 @@ std::vector<std::pair<double, double>> set_area_fraction(auto& points, double ar
 void setup_experiment(double area_fraction) {
     std::ofstream fout("initial.data");
     SystemProperties props {
-        1e-5,
-        0.3,
-        0.3,
+        1e-6,
+        0.04,
+        0.04,
         0.1,
         1e-3,
         4.8e-3,
         2e-4,
-        1e-3
+        1e-3,
+        4e3,
+        0.48,
+        0.05,
+        5e8,
+        0.3,
+        0.0
     };
 
     dump_preamble(fout, props);

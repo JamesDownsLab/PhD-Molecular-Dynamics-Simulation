@@ -98,6 +98,14 @@ private:
     double dimple_spacing{0};
     double dimple_depth{0};
     double base_height{0};
+
+    double ball_youngs{0};
+    double ball_poisson{0};
+    double ball_damping{0};
+    double base_youngs{0};
+    double base_poisson{0};
+    double base_damping{0};
+
     double _base_amplitude{0};
     double _base_period{0};
     double Time{0};

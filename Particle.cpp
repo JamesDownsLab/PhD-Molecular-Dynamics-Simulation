@@ -84,6 +84,9 @@ void force(Particle &p, BasePlate &basePlate) {
     if (xi > 0){ // Overlapping
 
         // Relative velocities
+        double dvx = p.vx();
+        double dvy = p.vy();
+        double dvz = p.vz() - basePlate.vz();
         double xidot = -(p.vz() - basePlate.vz());
 
         double GShear = p._youngs_modulus/(2*(1+p._poisson));

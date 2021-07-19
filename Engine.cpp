@@ -44,6 +44,24 @@ void Engine::init_system(const char *fname) {
         else if (type == "#base_height:"){
             fparticle >> base_height;
         }
+        else if (type == "#ball_youngs:"){
+            fparticle >> ball_youngs;
+        }
+        else if (type == "#ball_poisson:"){
+            fparticle >> ball_poisson;
+        }
+        else if (type == "#ball_damping:"){
+            fparticle >> ball_damping;
+        }
+        else if (type == "#base_youngs:"){
+            fparticle >> base_youngs;
+        }
+        else if (type == "#base_poisson:"){
+            fparticle >> base_poisson;
+        }
+        else if (type == "#base_damping:"){
+            fparticle >> base_damping;
+        }
         else {
             std::cout << "Unknown type: " << type << std::endl;
         }
