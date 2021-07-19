@@ -29,10 +29,13 @@ void Engine::dump() {
     std::fprintf(f1, "ITEM: TIMESTEP\n%d\n", int(Time / timestep));
     std::fprintf(f1, "ITEM: TIME\n%.8f\n", Time);
     std::fprintf(f1, "ITEM: BOX BOUNDS pp pp f\n%.4f %.4f\n%.4f %.4f\n%.4f %.4f\n", 0.0, lx, 0.0, ly, 0.0, lz);
-    std::fprintf(f1, "ITEM: NUMBER OF ATOMS\n%d\n", int(no_of_particles));
+    std::fprintf(f1, "ITEM: NUMBER OF ATOMS\n%d\n", int(no_of_particles)+int(base_particles.size()));
     std::fprintf(f1, "ITEM: ATOMS x y z vx vy vz radius type\n");
     for (Particle& p : particles) {
         std::fprintf(f1, "%.9f %.9f %.9f %.9f %.9f %.9f %.9f %d\n", p.x(), p.y(), p.z(), p.vx(), p.vy(), p.vz(), p.r(), 0);
+    }
+    for (Particle& p: base_particles) {
+        std::fprintf(f1, "%.9f %.9f %.9f %.9f %.9f %.9f %.9f %d\n", p.x(), p.y(), p.z(), p.vx(), p.vy(), p.vz(), p.r(), 1);
     }
 }
 
@@ -174,7 +177,7 @@ void Engine::make_forces() {
 void Engine::make_plate_forces() {
     for (auto p: particles){
         const double query_pt[2] = {p.x(), p.y()};
-        const double search_radius = p.r();
+        const double search_radius = sqrt(p.r());
         std::vector<std::pair<size_t,double>> ret_matches;
         nanoflann::SearchParams params;
         const size_t nMatches = tree->index->radiusSearch(&query_pt[0], search_radius, ret_matches, params);
@@ -276,6 +279,7 @@ void Engine::add_particles() {
             }
         }
     }
+    no_of_particles = particles.size();
 }
 
 void Engine::add_base_particles() {
@@ -291,6 +295,7 @@ void Engine::add_base_particles() {
             base_particles.push_back(pp);
         }
     }
+    no_of_base_particles = base_particles.size();
 }
 
 my_kd_tree_t* Engine::make_tree() {
