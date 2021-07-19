@@ -58,7 +58,7 @@ public:
     void periodic_bc(double x_0, double y_0, double lx, double ly);
     void set_force_to_zero() { _force = null_vec;}
 
-    void velocity_verlet(double dt, Vector G);
+    void velocity_verlet(double dt, Vector G, double m);
 
 private:
     Vector rtd0{null_vec}, rtd1{null_vec}, rtd2{null_vec};

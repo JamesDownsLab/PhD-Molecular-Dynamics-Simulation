@@ -12,13 +12,13 @@ std::istream &operator>>(std::istream &is, Particle &p) {
     return is;
 }
 
-void Particle::velocity_verlet(double dt, Vector G) {
+void Particle::velocity_verlet(double dt, Vector G, double m) {
 
         double a1 = dt;
         double a2 = dt * dt / 2;
 
         rtd0 += rtd1 * a1 + rtd2 * a2;
-        Vector new_rtd2 = (_force) * (1 / _m) + G;
+        Vector new_rtd2 = (_force) * (1 / m) + G;
         rtd1 += (rtd2 + new_rtd2) * (dt / 2);
         rtd2 = new_rtd2;
 }

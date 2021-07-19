@@ -5,7 +5,7 @@
 int main() {
     ProgramOptions options{
             "data.dump",
-            1
+            100
     };
 //    setup_experiment(0.8);
     Engine engine("initial.data", options);

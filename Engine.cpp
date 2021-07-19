@@ -68,7 +68,7 @@ void Engine::integrate() {
     // Update  the positions of all the particles
     std::for_each(particles.begin(), particles.end(),
                   [&](Particle& p){
-        p.velocity_verlet(timestep, G);
+        p.velocity_verlet(timestep, G, ball_mass);
     });
 
     // Apply periodic boundary conditions
@@ -178,7 +178,8 @@ void Engine::make_forces() {
 
 void Engine::make_plate_forces() {
     for (auto& p: particles){
-        const double query_pt[2] = {p.x(), p.y()};
+//        const double query_pt[2] = {p.x(), p.y()};
+        std::vector<double> query_pt = {p.x(), p.y()};
         const double search_radius = p.r()*p.r();
         std::vector<std::pair<size_t,double>> ret_matches;
         nanoflann::SearchParams params;
@@ -206,6 +207,7 @@ void Engine::read_system_params(const char *fname) {
 
         if (type == "#timestep:"){
             fparticle >> timestep;
+            std::cout << "Timestep = " << timestep << std::endl;
         }
         else if (type == "#lx:"){
             fparticle >> lx;
@@ -251,6 +253,9 @@ void Engine::read_system_params(const char *fname) {
         }
         else if (type == "#ball_height:"){
             fparticle >> ball_height;
+        }
+        else if (type == "#ball_mass:"){
+            fparticle >> ball_mass;
         }
         else {
             std::cout << "Unknown type: " << type << std::endl;

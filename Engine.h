@@ -120,6 +120,7 @@ private:
     double base_height{0};
     double ball_rad{0};
     double base_rad{0};
+    double ball_mass{0};
     double ball_height{0};
     double ball_youngs{0};
     double ball_poisson{0};
