@@ -19,6 +19,7 @@ Engine::Engine(const char *fname, ProgramOptions& options)
 void Engine::init_system() {
     add_particles();
     add_base_particles();
+    tree = make_tree();
     dump();
 }
 
@@ -171,8 +172,18 @@ void Engine::make_forces() {
 }
 
 void Engine::make_plate_forces() {
-    for (unsigned int i{0}; i < no_of_particles; i++){
-        force(particles[i], basePlate, ball_base_normal_constant);
+    for (auto p: particles){
+        std::vector<double> query_pt{p.x(), p.y()};
+        const size_t num_results = 5;
+        std::vector<size_t> ret_indexes(num_results);
+        std::vector<double> out_dists_sqr(num_results);
+        nanoflann::KNNResultSet<double> resultSet(num_results);
+
+        resultSet.init(&ret_indexes[0], &out_dists_sqr[0]);
+        tree->index->findNeighbors(resultSet, &query_pt[0], nanoflann::SearchParams(10));
+
+        std::cout << ret_indexes[0] << std::endl;
+        force(p, basePlate, ball_base_normal_constant);
     }
 }
 
@@ -285,6 +296,19 @@ void Engine::add_base_particles() {
             base_particles.push_back(pp);
         }
     }
+}
+
+my_kd_tree_t* Engine::make_tree() {
+    for (auto& p: base_particles){
+        base_particles_for_tree.push_back({p.x(), p.y()});
+    }
+
+
+    const size_t dims{2};
+    auto* mat_index = new my_kd_tree_t {dims, base_particles_for_tree, 10};
+    mat_index->index->buildIndex();
+    return mat_index;
+
 }
 
 

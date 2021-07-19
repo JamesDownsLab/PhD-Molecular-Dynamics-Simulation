@@ -6,12 +6,18 @@
 #define INC_3DMOLECULARDYNAMICS_ENGINE_H
 
 #include <cmath>
+#include <cstdlib>
 #include <fstream>
 #include <filesystem>
 #include <vector>
 #include "Particle.h"
 #include "BasePlate.h"
 #include <random>
+#include "nanoflann.h"
+#include "KDTreeVectorOfVectorsAdaptor.h"
+
+typedef  std::vector<std::vector<double>> my_vector_of_vectors_t;
+typedef KDTreeVectorOfVectorsAdaptor<my_vector_of_vectors_t, double> my_kd_tree_t;
 
 namespace fs = std::filesystem;
 
@@ -48,6 +54,8 @@ private:
     void add_particles();
 
     void add_base_particles();
+
+    my_kd_tree_t* make_tree();
 
     /// Calculate the collisional forces between all particles
     void make_forces();
@@ -89,7 +97,9 @@ private:
     size_t no_of_particles{0};
     std::vector<Particle> particles;
     std::vector<Particle> base_particles;
+    my_kd_tree_t *tree;
     ProgramOptions _options;
+    my_vector_of_vectors_t base_particles_for_tree;
 
     /////////////////////////////////////////////////////////
     /// File Writing
@@ -116,6 +126,7 @@ private:
     double base_poisson{0};
     double ball_base_normal_constant{0};
     double area_fraction{0};
+
 
     double _base_amplitude{0};
     double _base_period{0};
