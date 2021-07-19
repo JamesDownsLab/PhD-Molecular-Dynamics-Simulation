@@ -19,7 +19,7 @@ class Particle {
 
     friend std::istream& operator >> (std::istream& is, Particle& p);
     friend void force(Particle& p1, Particle& p2, double lx, double ly, double lz);
-    friend void force(Particle& p, BasePlate& basePlate);
+    friend void force(Particle& p, BasePlate& basePlate, double force_constant);
 
 
 public:
@@ -65,7 +65,7 @@ private:
     Vector rtd0{null}, rtd1{null}, rtd2{null}, rtd3{null}, rtd4{null};
     Vector rtd0_old, rtd0_new;
     Vector _force;
-    double _r, _m, _youngs_modulus, _poisson, _coeff_res, _coeff_fric;
+    double _r, _m, _youngs_modulus, _poisson, _coeff_res, _coeff_fric, _damping_constant;
 };
 
 

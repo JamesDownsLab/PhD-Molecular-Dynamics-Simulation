@@ -6,7 +6,7 @@
 #include <cmath>
 
 std::istream &operator>>(std::istream &is, Particle &p) {
-    is >> p.rtd0 >> p._r >> p._m >> p._youngs_modulus >> p._poisson >> p._coeff_res >> p._coeff_fric;
+    is >> p.rtd0 >> p._r >> p._m >> p._youngs_modulus >> p._poisson >> p._coeff_res >> p._coeff_fric >> p._damping_constant;
     return is;
 }
 
@@ -76,26 +76,15 @@ void Particle::periodic_bc(double x_0, double y_0, double lx, double ly) {
     while (rtd0.y() > y_0 + ly) rtd0.y() -= ly;
 }
 
-void force(Particle &p, BasePlate &basePlate) {
+void force(Particle &p, BasePlate &basePlate, double force_constant) {
     double dz = p.z() - basePlate.z();
 
     // Overlap
     double xi = p.r() - dz;
     if (xi > 0){ // Overlapping
-
-        // Relative velocities
-        double dvx = p.vx();
-        double dvy = p.vy();
-        double dvz = p.vz() - basePlate.vz();
         double xidot = -(p.vz() - basePlate.vz());
-
-        double GShear = p._youngs_modulus/(2*(1+p._poisson));
-        double kn = 4.0 * GShear / (3*(1-p._poisson));
-        double a = pow(-2.0 * log(p._coeff_res) / M_PI, 2);
-        double gamma_n = sqrt(a*2*kn/p.m()/(1+0.25*a));
-
-        double elastic_force = kn * xi;
-        double dissipative_force = gamma_n * xidot;
+        double elastic_force = force_constant * pow(xi, 1.5);
+        double dissipative_force = force_constant * p._damping_constant*xidot*sqrt(xi)/2;
         double fn = elastic_force + dissipative_force;
 
         if (fn > 0) {

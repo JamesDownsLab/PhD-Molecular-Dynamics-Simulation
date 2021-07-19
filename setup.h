@@ -31,6 +31,7 @@ struct MaterialProperties {
     double poisson;
     double coeff_res;
     double coeff_fric;
+    double damping_constant;
 };
 
 MaterialProperties ballProps {
@@ -39,7 +40,8 @@ MaterialProperties ballProps {
     4e-3,
     0.48,
     0.1,
-    0.5
+    0.5,
+    0.05
 };
 
 void dump(
@@ -52,7 +54,7 @@ void dump(
     os << x << "\t" << y << "\t" << z << "\t"
         << props.radius << "\t" << props.mass << "\t"
         << props.youngs_modulus << "\t" << props.poisson << "\t"
-        << props.coeff_res << "\t" << props.coeff_fric << "\n";
+        << props.coeff_res << "\t" << props.coeff_fric << "\t" << props.damping_constant << "\n";
 }
 
 void dump_preamble(std::ofstream& os, SystemProperties& p) {
@@ -67,10 +69,8 @@ void dump_preamble(std::ofstream& os, SystemProperties& p) {
         << "#base_height: " << p.base_height << "\n"
         << "#ball_youngs: " << p.ball_young << "\n"
         << "#ball_poisson: " << p.ball_poisson << "\n"
-        << "#ball_damping: " << p.ball_damping << "\n"
         << "#base_youngs: " << p.base_young << "\n"
-        << "#base_poisson " << p.base_poisson << "\n"
-        << "#base_damping " << p.base_damping << "\n";
+        << "#base_poisson " << p.base_poisson << "\n";
 }
 
 std::vector<std::pair<double, double>> create_lattice(double lx, double ly, double L){

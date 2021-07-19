@@ -10,6 +10,9 @@ Engine::Engine(const char *fname, ProgramOptions& options)
     init_system(fname);
     init_lattice_algorithm();
     basePlate.set_zi(base_height);
+    ball_base_normal_constant =
+            4*sqrt(particles[0].r())/3*
+                    (1/((1-ball_poisson*ball_poisson)/ball_youngs + (1-base_poisson*base_poisson)/base_youngs));
 }
 
 void Engine::init_system(const char *fname) {
@@ -233,7 +236,7 @@ void Engine::make_forces() {
 
 void Engine::make_plate_forces() {
     for (unsigned int i{0}; i < no_of_particles; i++){
-        force(particles[i], basePlate);
+        force(particles[i], basePlate, ball_base_normal_constant);
     }
 }
 
