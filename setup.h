@@ -18,10 +18,8 @@ struct SystemProperties {
     double base_height;
     double ball_young;
     double ball_poisson;
-    double ball_damping;
     double base_young;
     double base_poisson;
-    double base_damping;
 };
 
 struct MaterialProperties {
@@ -41,7 +39,7 @@ MaterialProperties ballProps {
     0.48,
     0.1,
     0.5,
-    0.05
+    0.01
 };
 
 void dump(
@@ -110,7 +108,7 @@ std::vector<std::pair<double, double>> set_area_fraction(auto& points, double ar
 void setup_experiment(double area_fraction) {
     std::ofstream fout("initial.data");
     SystemProperties props {
-        1e-6,
+        1e-5,
         0.04,
         0.04,
         0.1,
@@ -120,10 +118,8 @@ void setup_experiment(double area_fraction) {
         1e-3,
         4e3,
         0.48,
-        0.05,
         5e8,
         0.3,
-        0.0
     };
 
     dump_preamble(fout, props);
