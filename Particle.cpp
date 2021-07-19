@@ -7,6 +7,8 @@
 
 std::istream &operator>>(std::istream &is, Particle &p) {
     is >> p.rtd0 >> p._r >> p._m >> p._youngs_modulus >> p._poisson >> p._coeff_res >> p._coeff_fric >> p._damping_constant;
+
+    p._force_constant = 2*p._youngs_modulus* sqrt(p._r)/(3*(1-p._poisson*p._poisson));
     return is;
 }
 
@@ -34,6 +36,7 @@ void force(Particle &p1, Particle &p2, double lx, double ly, double lz) {
         double xi = r1 + r2 - rr;
 
         if (xi > 0) { // If overlapping
+            double sqrt_xi = sqrt(xi);
             double rr_rez = 1 / rr;
 
             // Unit vectors
@@ -49,15 +52,8 @@ void force(Particle &p1, Particle &p2, double lx, double ly, double lz) {
             // Overlap rate
             double xidot = -(ex * dvx + ey * dvy + ez*dvz);
 
-            // Particle properties
-            double GShear = p1._youngs_modulus/(2*(1+p1._poisson));
-            double kn = 4.0 * GShear / (3*(1-p1._poisson));
-            double a = pow(-2.0 * log(p1._coeff_res) / M_PI, 2);
-            double gamma_n = sqrt(a*2*kn/p1.m()/(1+0.25*a));
-
-
-            double elastic_force = kn * xi;
-            double dissipative_force = gamma_n * xidot;
+            double elastic_force = p1._force_constant * xi * sqrt_xi;
+            double dissipative_force = p1._force_constant * p1._damping_constant * sqrt_xi * xidot;
             double fn = elastic_force + dissipative_force;
 
             if (fn < 0) fn = 0;
