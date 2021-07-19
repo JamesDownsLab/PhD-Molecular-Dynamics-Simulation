@@ -16,14 +16,13 @@ inline double normalize(double dx, double L) {
 }
 
 class Particle {
-
     friend std::istream& operator >> (std::istream& is, Particle& p);
     friend void force(Particle& p1, Particle& p2, double lx, double ly, double lz);
     friend void force(Particle& p, BasePlate& basePlate, double force_constant);
 
 
 public:
-    Particle(double x, double y, double z, double r) : rtd0(x, y, z), rtd1(null), rtd2(null), rtd3(null), rtd4(null), _r(r){}
+    Particle(double x, double y, double z, double r) : rtd0(x, y, z), rtd1(null_vec), rtd2(null_vec), _r(r){}
     Particle(const Particle& rhs) = default;
     Particle(Particle && rhs) = default;
     Particle& operator=(const Particle & rhs) = default;
@@ -57,16 +56,13 @@ public:
     ///////////////////////////////////////
     void add_force(const Vector& f) {_force += f;}
     void periodic_bc(double x_0, double y_0, double lx, double ly);
-    void set_force_to_zero() { _force = null;}
+    void set_force_to_zero() { _force = null_vec;}
 
     void velocity_verlet(double dt, Vector G);
 
 private:
-    Vector rtd0{null}, rtd1{null}, rtd2{null}, rtd3{null}, rtd4{null};
-    Vector rtd0_old, rtd0_new;
-    Vector _force;
-    double _r, _m, _youngs_modulus, _poisson, _coeff_res, _coeff_fric, _damping_constant, _force_constant;
+    Vector rtd0{null_vec}, rtd1{null_vec}, rtd2{null_vec};
+    Vector _force{null_vec};
+    double _r{0}, _m{0}, _youngs_modulus{0}, _poisson{0}, _coeff_res{0}, _coeff_fric{0}, _damping_constant{0}, _force_constant{0};
 };
-
-
 #endif //INC_3DMOLECULARDYNAMICS_PARTICLE_H

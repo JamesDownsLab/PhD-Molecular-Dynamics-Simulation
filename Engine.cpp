@@ -4,6 +4,8 @@
 
 #include "Engine.h"
 
+#include <memory>
+
 Engine::Engine(const char *fname, ProgramOptions& options)
         : _options{options} {
     f1 = fopen(_options.savepath.string().c_str(), "w");
@@ -19,7 +21,7 @@ Engine::Engine(const char *fname, ProgramOptions& options)
 void Engine::init_system() {
     add_particles();
     add_base_particles();
-    tree = make_tree();
+    make_tree();
     dump();
 }
 
@@ -29,7 +31,7 @@ void Engine::dump() {
     std::fprintf(f1, "ITEM: TIMESTEP\n%d\n", int(Time / timestep));
     std::fprintf(f1, "ITEM: TIME\n%.8f\n", Time);
     std::fprintf(f1, "ITEM: BOX BOUNDS pp pp f\n%.4f %.4f\n%.4f %.4f\n%.4f %.4f\n", 0.0, lx, 0.0, ly, 0.0, lz);
-    std::fprintf(f1, "ITEM: NUMBER OF ATOMS\n%d\n", int(no_of_particles)+int(base_particles.size()));
+    std::fprintf(f1, "ITEM: NUMBER OF ATOMS\n%d\n", int(no_of_particles)+int(no_of_base_particles));
     std::fprintf(f1, "ITEM: ATOMS x y z vx vy vz radius type\n");
     for (Particle& p : particles) {
         std::fprintf(f1, "%.9f %.9f %.9f %.9f %.9f %.9f %.9f %d\n", p.x(), p.y(), p.z(), p.vx(), p.vy(), p.vz(), p.r(), 0);
@@ -84,8 +86,8 @@ void Engine::integrate() {
 ///////////////////////////////////////////////////////////////////////////////
 
 void Engine::init_lattice_algorithm() {
-    rmin = particles[0].r();
-    rmax = particles[0].r();
+    rmin = particles.at(0).r();
+    rmax = particles.at(0).r();
 
     // Calculate gk, the size of the lattice sites
     gk = sqrt(2) * rmin;
@@ -113,7 +115,7 @@ void Engine::make_ilist() {
         double y = particles[i].y();
         int ix = int((x-x_0) / gk);
         int iy = int((y-y_0) / gk);
-        pindex[ix][iy] = i;
+        pindex[ix][iy] = (int)i;
         partners[i].clear();
     }
 
@@ -147,7 +149,7 @@ bool Engine::ilist_needs_update() {
         double y = particles[i].y();
         int ix = int((x - x_0) / gk);
         int iy = int((y - y_0) / gk);
-        if (pindex[ix][iy] != i) {
+        if (pindex.at(ix).at(iy) != i) {
             clear_pindex();
             return true;
         }
@@ -175,13 +177,12 @@ void Engine::make_forces() {
 }
 
 void Engine::make_plate_forces() {
-    for (auto p: particles){
+    for (auto& p: particles){
         const double query_pt[2] = {p.x(), p.y()};
-        const double search_radius = sqrt(p.r());
+        const double search_radius = p.r()*p.r();
         std::vector<std::pair<size_t,double>> ret_matches;
         nanoflann::SearchParams params;
         const size_t nMatches = tree->index->radiusSearch(&query_pt[0], search_radius, ret_matches, params);
-        std::cout << "nMatches = " << nMatches << std::endl;
     }
 }
 
@@ -298,15 +299,13 @@ void Engine::add_base_particles() {
     no_of_base_particles = base_particles.size();
 }
 
-my_kd_tree_t* Engine::make_tree() {
+void Engine::make_tree() {
     for (auto& p: base_particles){
         base_particles_for_tree.push_back({p.x(), p.y()});
     }
 
 
     const size_t dims{2};
-    auto* mat_index = new my_kd_tree_t {dims, base_particles_for_tree, 10};
-    mat_index->index->buildIndex();
-    return mat_index;
-
+    tree = std::make_unique<my_kd_tree_t>(dims, base_particles_for_tree, 10);
+    tree->index->buildIndex();
 }

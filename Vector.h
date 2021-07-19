@@ -90,6 +90,6 @@ private:
     double _x, _y, _z;
 };
 
-const Vector null(0, 0, 0);
+const Vector null_vec(0, 0, 0);
 
 #endif //INC_3DMOLECULARDYNAMICS_VECTOR_H

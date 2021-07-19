@@ -55,7 +55,7 @@ private:
 
     void add_base_particles();
 
-    my_kd_tree_t* make_tree();
+    void make_tree();
 
     /// Calculate the collisional forces between all particles
     void make_forces();
@@ -97,7 +97,7 @@ private:
     size_t no_of_particles{0};
     std::vector<Particle> particles;
     std::vector<Particle> base_particles;
-    my_kd_tree_t *tree;
+    std::unique_ptr<my_kd_tree_t> tree;
     ProgramOptions _options;
     my_vector_of_vectors_t base_particles_for_tree;
     size_t no_of_base_particles{0};
