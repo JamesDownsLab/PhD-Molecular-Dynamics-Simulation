@@ -8,6 +8,7 @@
 
 Engine::Engine(const char *fname, ProgramOptions& options)
         : _options{options} {
+    begin = std::chrono::steady_clock::now();
     f1 = fopen(_options.savepath.string().c_str(), "w");
     read_system_params("params.txt");
     init_system();
@@ -28,7 +29,10 @@ void Engine::init_system() {
 }
 
 void Engine::dump() {
-    std::cout << "Dump at Time : " << Time << " s" << std::endl;
+    std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
+    std::cout << "DUMP Simulation Time : " << Time << " s\t"
+        << "Timestep : " << Time/timestep << "\t"
+        << "Elapsed time: " << std::chrono::duration_cast<std::chrono::seconds>(now-begin).count() << "s" << std::endl;
 
     std::fprintf(f1, "ITEM: TIMESTEP\n%d\n", int(Time / timestep));
     std::fprintf(f1, "ITEM: TIME\n%.8f\n", Time);

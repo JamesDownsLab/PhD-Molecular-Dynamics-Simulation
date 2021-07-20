@@ -13,6 +13,7 @@
 #include "Particle.h"
 #include "BasePlate.h"
 #include <random>
+#include <chrono>
 
 typedef  std::vector<std::vector<double>> my_vector_of_vectors_t;
 
@@ -137,6 +138,8 @@ private:
     double Time{0};
     Vector G{0, 0, -9.81};
     BasePlate basePlate{0, 0, 0};
+
+    std::chrono::steady_clock::time_point begin;
 
 };
 
