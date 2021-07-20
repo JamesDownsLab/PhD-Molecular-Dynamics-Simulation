@@ -13,11 +13,8 @@
 #include "Particle.h"
 #include "BasePlate.h"
 #include <random>
-#include "nanoflann.h"
-#include "KDTreeVectorOfVectorsAdaptor.h"
 
 typedef  std::vector<std::vector<double>> my_vector_of_vectors_t;
-typedef KDTreeVectorOfVectorsAdaptor<my_vector_of_vectors_t, double> my_kd_tree_t;
 
 namespace fs = std::filesystem;
 
