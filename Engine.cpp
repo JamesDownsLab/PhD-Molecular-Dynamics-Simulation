@@ -19,7 +19,7 @@ Engine::Engine(const char *fname, ProgramOptions& options)
                     (1/((1-ball_poisson*ball_poisson)/ball_youngs + (1-base_poisson*base_poisson)/base_youngs));
 
     ball_normal_constant = 2*ball_youngs * sqrt(ball_rad)/(3*(1-ball_poisson*ball_poisson));
-    ball_damping_constant = 0.01;
+    ball_damping_constant = 0.00001;
     ball_base_damping_constant = 0.01;
 }
 
@@ -66,6 +66,7 @@ void Engine::integrate() {
     std::for_each(particles.begin(), particles.end(),
                   [&](Particle& p){
         p.set_force_to_zero();
+        p.predict(timestep);
     });
 
     // Calculate all the forces between particles
@@ -77,7 +78,8 @@ void Engine::integrate() {
     // Update  the positions of all the particles
     std::for_each(particles.begin(), particles.end(),
                   [&](Particle& p){
-        p.velocity_verlet(timestep, G, ball_mass);
+//        p.velocity_verlet(timestep, G, ball_mass);
+            p.correct(timestep, G, ball_mass);
     });
 
     // Apply periodic boundary conditions

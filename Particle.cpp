@@ -5,16 +5,6 @@
 #include "Particle.h"
 #include <cmath>
 
-void Particle::velocity_verlet(double dt, Vector G, double m) {
-
-        double a1 = dt;
-        double a2 = dt * dt / 2;
-
-        rtd0 += rtd1 * a1 + rtd2 * a2;
-        Vector new_rtd2 = (_force) * (1 / m) + G;
-        rtd1 += (rtd2 + new_rtd2) * (dt / 2);
-        rtd2 = new_rtd2;
-}
 
 void force(Particle &p1, Particle &p2, double force_constant, double damping_constant, double lx, double ly, double lz) {
     double dx = normalize(p1.x() - p2.x(), lx);
@@ -103,4 +93,35 @@ void force(Particle &p, Particle &b, BasePlate &basePlate, double force_constant
             }
         }
     }
+}
+
+void Particle::predict(double dt) {
+    double a1 = dt;
+    double a2 = a1*dt/2;
+    double a3 = a2*dt/3;
+    double a4 = a3*dt/4;
+
+    rtd0 += a1*rtd1 + a2*rtd2 + a3*rtd3 + a4*rtd4;
+    rtd1 += a1*rtd2 + a2*rtd3 + a3*rtd4;
+    rtd2 += a1*rtd3 + a2*rtd4;
+    rtd3 += a1*rtd4;
+}
+
+void Particle::correct(double dt, Vector G, double mass) {
+
+    static Vector accel, corr;
+
+    double dtrez = 1/dt;
+    const double coeff0 = double(19)/double(90) * (dt*dt/double(2));
+    const double coeff1 = double(3)/double(4)*(dt/double(2));
+    const double coeff3 = double(1)/double(2)*(double(3)*dtrez);
+    const double coeff4 = double(1)/double(12)*(double(12)*(dtrez*dtrez));
+
+    accel = Vector((1/mass)*_force.x()+G.x(), (1/mass)*_force.y()+G.y(), (1/mass)*_force.z()+G.z());
+    corr = accel - rtd2;
+    rtd0 += coeff0*corr;
+    rtd1 += coeff1*corr;
+    rtd2 = accel;
+    rtd3 += coeff3*corr;
+    rtd4 += coeff4*corr;
 }

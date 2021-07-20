@@ -58,10 +58,11 @@ public:
     void periodic_bc(double x_0, double y_0, double lx, double ly);
     void set_force_to_zero() { _force = null_vec;}
 
-    void velocity_verlet(double dt, Vector G, double m);
+    void predict(double dt);
+    void correct(double dt, Vector G, double mass);
 
 private:
-    Vector rtd0{null_vec}, rtd1{null_vec}, rtd2{null_vec};
+    Vector rtd0{null_vec}, rtd1{null_vec}, rtd2{null_vec}, rtd3{null_vec}, rtd4{null_vec};
     Vector _force{null_vec};
     double _r{0}, _m{0}, _youngs_modulus{0}, _poisson{0}, _coeff_res{0}, _coeff_fric{0}, _damping_constant{0}, _force_constant{0};
 };
