@@ -184,14 +184,17 @@ void Engine::make_forces() {
 
 void Engine::make_plate_forces() {
     for (auto& p: particles){
-        double x = p.x();
-        double y = p.y();
-        int ix = int(x/gk_base);
-        int iy = int(y/gk_base);
-        for (int dx=-gm_base; dx<=gm_base; dx++){
-            for (int dy=-gm_base; dy<=gm_base; dy++){
-                size_t k = pindex_base[(ix+dx+nx_base)%nx_base][(iy+dy+ny_base)%ny_base];
-                force(p, base_particles.at(k), basePlate, ball_base_normal_constant);
+        double z = p.z();
+        if (z-basePlate.z() < ball_rad+base_rad) {
+            double x = p.x();
+            double y = p.y();
+            int ix = int(x / gk_base);
+            int iy = int(y / gk_base);
+            for (int dx = -gm_base; dx <= gm_base; dx++) {
+                for (int dy = -gm_base; dy <= gm_base; dy++) {
+                    size_t k = pindex_base[(ix + dx + nx_base) % nx_base][(iy + dy + ny_base) % ny_base];
+                    force(p, base_particles.at(k), basePlate, ball_base_normal_constant);
+                }
             }
         }
     }
