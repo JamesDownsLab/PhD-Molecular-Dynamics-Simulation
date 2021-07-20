@@ -55,8 +55,6 @@ private:
 
     void add_base_particles();
 
-    void make_tree();
-
     /// Calculate the collisional forces between all particles
     void make_forces();
 
@@ -76,6 +74,7 @@ private:
 
     /// Vector containing a list of neighbours for each particle.
     std::vector<std::vector<int>> partners;
+    std::vector<std::vector<int>> partners_base;
 
     /// Updates pindex and partners.
     void make_ilist();
@@ -84,8 +83,14 @@ private:
     bool ilist_needs_update();
     void clear_pindex();
     void init_lattice_algorithm();
+    void init_lattice_algorithm_for_base_particles();
+    void clear_pindex_base();
     double rmin{0}, rmax{0}, gk{0};
+    double r_base{0}, gk_base{0};
     int gm{0}, Nx{0}, Ny{0};
+    int gm_base{0}, nx_base{0}, ny_base{0};
+
+    std::vector<std::vector<size_t>> pindex_base;
 
     void dump();
     void check_dump();
@@ -97,7 +102,7 @@ private:
     size_t no_of_particles{0};
     std::vector<Particle> particles;
     std::vector<Particle> base_particles;
-    std::unique_ptr<my_kd_tree_t> tree;
+//    std::unique_ptr<my_kd_tree_t> tree;
     ProgramOptions _options;
     my_vector_of_vectors_t base_particles_for_tree;
     size_t no_of_base_particles{0};

@@ -11,7 +11,7 @@ Engine::Engine(const char *fname, ProgramOptions& options)
     f1 = fopen(_options.savepath.string().c_str(), "w");
     read_system_params("params.txt");
     init_system();
-    init_lattice_algorithm();
+
     basePlate.set_zi(base_height);
     ball_base_normal_constant =
             4*sqrt(particles[0].r())/3*
@@ -21,8 +21,10 @@ Engine::Engine(const char *fname, ProgramOptions& options)
 void Engine::init_system() {
     add_particles();
     add_base_particles();
-    make_tree();
+//    make_tree();
     dump();
+    init_lattice_algorithm();
+    init_lattice_algorithm_for_base_particles();
 }
 
 void Engine::dump() {
@@ -178,15 +180,15 @@ void Engine::make_forces() {
 
 void Engine::make_plate_forces() {
     for (auto& p: particles){
-//        const double query_pt[2] = {p.x(), p.y()};
-        std::vector<double> query_pt = {p.x(), p.y()};
-        const double search_radius = p.r()*p.r();
-        std::vector<std::pair<size_t,double>> ret_matches;
-        nanoflann::SearchParams params;
-        const size_t nMatches = tree->index->radiusSearch(&query_pt[0], search_radius, ret_matches, params);
-        for (size_t i{0}; i<nMatches; i++){
-            size_t n = ret_matches.at(i).first;
-            force(p, base_particles.at(n), basePlate, ball_base_normal_constant);
+        double x = p.x();
+        double y = p.y();
+        int ix = int(x/gk_base);
+        int iy = int(y/gk_base);
+        for (int dx=-gm_base; dx<=gm_base; dx++){
+            for (int dy=-gm_base; dy<=gm_base; dy++){
+                size_t k = pindex_base[(ix+dx+nx_base)%nx_base][(iy+dy+ny_base)%ny_base];
+                force(p, base_particles.at(k), basePlate, ball_base_normal_constant);
+            }
         }
     }
 }
@@ -308,13 +310,33 @@ void Engine::add_base_particles() {
     no_of_base_particles = base_particles.size();
 }
 
-void Engine::make_tree() {
-    for (auto& p: base_particles){
-        base_particles_for_tree.push_back({p.x(), p.y()});
+void Engine::init_lattice_algorithm_for_base_particles() {
+    r_base = base_particles.at(0).r();
+    gk_base = sqrt(2)*r_base;
+    gm_base = int(2*particles.at(0).r()/gk+1);
+    nx_base = int(lx/gk_base)+1;
+    ny_base = int(ly/gk_base)+1;
+
+    partners_base.resize(no_of_particles);
+    pindex_base.resize(nx_base);
+    for (auto & px : pindex_base){
+        px.resize(ny_base);
     }
+    clear_pindex_base();
 
+    for (size_t i=0; i<base_particles.size(); i++) {
+        double x = base_particles[i].x();
+        double y = base_particles[i].y();
+        size_t ix = int(x/gk_base);
+        size_t iy = int(y/gk_base);
+        pindex_base.at(ix).at(iy)=i;
+    }
+}
 
-    const size_t dims{2};
-    tree = std::make_unique<my_kd_tree_t>(dims, base_particles_for_tree, 10);
-    tree->index->buildIndex();
+void Engine::clear_pindex_base() {
+    for (auto &px: pindex) {
+        for (auto &py: px) {
+            py = -1;
+        }
+    }
 }
