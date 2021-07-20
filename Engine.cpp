@@ -17,12 +17,15 @@ Engine::Engine(const char *fname, ProgramOptions& options)
     ball_base_normal_constant =
             4*sqrt(particles[0].r())/3*
                     (1/((1-ball_poisson*ball_poisson)/ball_youngs + (1-base_poisson*base_poisson)/base_youngs));
+
+    ball_normal_constant = 2*ball_youngs * sqrt(ball_rad)/(3*(1-ball_poisson*ball_poisson));
+    ball_damping_constant = 0.01;
+    ball_base_damping_constant = 0.01;
 }
 
 void Engine::init_system() {
     add_particles();
     add_base_particles();
-//    make_tree();
     dump();
     init_lattice_algorithm();
     init_lattice_algorithm_for_base_particles();
@@ -177,7 +180,7 @@ void Engine::make_forces() {
     for (unsigned int i{ 0 }; i < no_of_particles; i++) {
         for (unsigned int k{ 0 }; k < partners[i].size(); k++) {
             int pk = partners[i][k];
-            force(particles[i], particles[pk], lx, ly, lz);
+            force(particles[i], particles[pk], ball_normal_constant, ball_damping_constant, lx, ly, lz);
         }
     }
 }
@@ -193,7 +196,7 @@ void Engine::make_plate_forces() {
             for (int dx = -gm_base; dx <= gm_base; dx++) {
                 for (int dy = -gm_base; dy <= gm_base; dy++) {
                     size_t k = pindex_base[(ix + dx + nx_base) % nx_base][(iy + dy + ny_base) % ny_base];
-                    force(p, base_particles.at(k), basePlate, ball_base_normal_constant);
+                    force(p, base_particles.at(k), basePlate, ball_base_normal_constant, ball_base_damping_constant);
                 }
             }
         }

@@ -130,8 +130,10 @@ private:
     double base_youngs{0};
     double base_poisson{0};
     double ball_base_normal_constant{0};
+    double ball_base_damping_constant{0};
     double area_fraction{0};
-
+    double ball_normal_constant{0};
+    double ball_damping_constant{0};
 
     double _base_amplitude{0};
     double _base_period{0};

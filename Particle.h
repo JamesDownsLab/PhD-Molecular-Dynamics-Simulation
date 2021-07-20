@@ -17,8 +17,8 @@ inline double normalize(double dx, double L) {
 
 class Particle {
     friend std::istream& operator >> (std::istream& is, Particle& p);
-    friend void force(Particle& p1, Particle& p2, double lx, double ly, double lz);
-    friend void force(Particle& p, Particle& b, BasePlate& basePlate, double force_constant);
+    friend void force(Particle& p1, Particle& p2, double force_constant, double damping_constant, double lx, double ly, double lz);
+    friend void force(Particle& p, Particle& b, BasePlate& basePlate, double force_constant, double damping_constant);
 
 
 public:

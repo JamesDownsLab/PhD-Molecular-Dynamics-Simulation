@@ -5,13 +5,6 @@
 #include "Particle.h"
 #include <cmath>
 
-std::istream &operator>>(std::istream &is, Particle &p) {
-    is >> p.rtd0 >> p._r >> p._m >> p._youngs_modulus >> p._poisson >> p._coeff_res >> p._coeff_fric >> p._damping_constant;
-
-    p._force_constant = 2*p._youngs_modulus* sqrt(p._r)/(3*(1-p._poisson*p._poisson));
-    return is;
-}
-
 void Particle::velocity_verlet(double dt, Vector G, double m) {
 
         double a1 = dt;
@@ -23,7 +16,7 @@ void Particle::velocity_verlet(double dt, Vector G, double m) {
         rtd2 = new_rtd2;
 }
 
-void force(Particle &p1, Particle &p2, double lx, double ly, double lz) {
+void force(Particle &p1, Particle &p2, double force_constant, double damping_constant, double lx, double ly, double lz) {
     double dx = normalize(p1.x() - p2.x(), lx);
     double dy = normalize(p1.y() - p2.y(), ly);
     double dz = normalize(p1.z() - p2.z(), lz);
@@ -52,8 +45,8 @@ void force(Particle &p1, Particle &p2, double lx, double ly, double lz) {
             // Overlap rate
             double xidot = -(ex * dvx + ey * dvy + ez*dvz);
 
-            double elastic_force = p1._force_constant * xi * sqrt_xi;
-            double dissipative_force = p1._force_constant * p1._damping_constant * sqrt_xi * xidot;
+            double elastic_force = force_constant * xi * sqrt_xi;
+            double dissipative_force = force_constant * damping_constant * sqrt_xi * xidot;
             double fn = elastic_force + dissipative_force;
 
             if (fn < 0) fn = 0;
@@ -72,7 +65,7 @@ void Particle::periodic_bc(double x_0, double y_0, double lx, double ly) {
     while (rtd0.y() > y_0 + ly) rtd0.y() -= ly;
 }
 
-void force(Particle &p, Particle &b, BasePlate &basePlate, double force_constant) {
+void force(Particle &p, Particle &b, BasePlate &basePlate, double force_constant, double damping_constant) {
     double dx = p.x() - b.x();
     double dy = p.y() - b.y();
     double dz = p.z() - basePlate.z();
@@ -101,7 +94,7 @@ void force(Particle &p, Particle &b, BasePlate &basePlate, double force_constant
             double xidot = -(ex * dvx + ey * dvy + ez*dvz);
 
             double elastic_force = force_constant * sqrt_xi * xi;
-            double dissipative_force = force_constant * p._damping_constant * xidot * sqrt_xi / 2;
+            double dissipative_force = force_constant * damping_constant * xidot * sqrt_xi / 2;
             double fn = elastic_force + dissipative_force;
 
 

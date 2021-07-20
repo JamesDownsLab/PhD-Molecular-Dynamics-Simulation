@@ -25,7 +25,11 @@ int main(int argc, char** argv){
     };
 //    setup_experiment(0.8);
     Engine engine("initial.data", options);
-    engine.set_baseplate(2e-4, 0.02);
+    engine.set_baseplate(1.5e-4, 0.02);
+    for (int s{0}; s <= steps; s++) {
+        engine.step();
+    }
+    engine.set_baseplate(1e-10, 0.02);
     for (int s{0}; s <= steps; s++) {
         engine.step();
     }
