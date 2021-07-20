@@ -43,7 +43,7 @@ void Engine::dump() {
         std::fprintf(f1, "%.9f %.9f %.9f %.9f %.9f %.9f %.9f %d\n", p.x(), p.y(), p.z(), p.vx(), p.vy(), p.vz(), p.r(), 0);
     }
     for (Particle& p: base_particles) {
-        std::fprintf(f1, "%.9f %.9f %.9f %.9f %.9f %.9f %.9f %d\n", p.x(), p.y(), p.z(), p.vx(), p.vy(), p.vz(), p.r(), 1);
+        std::fprintf(f1, "%.9f %.9f %.9f %.9f %.9f %.9f %.9f %d\n", p.x(), p.y(), basePlate.z(), p.vx(), p.vy(), basePlate.vz(), p.r(), 1);
     }
 }
 
