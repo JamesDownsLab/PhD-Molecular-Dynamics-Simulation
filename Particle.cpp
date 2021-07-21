@@ -6,7 +6,7 @@
 #include <cmath>
 
 
-void force(Particle &p1, Particle &p2, double force_constant, double damping_constant, double lx, double ly, double lz) {
+void force(Particle &p1, Particle &p2, double lx, double ly, double lz) {
     double dx = normalize(p1.x() - p2.x(), lx);
     double dy = normalize(p1.y() - p2.y(), ly);
     double dz = normalize(p1.z() - p2.z(), lz);
@@ -19,6 +19,11 @@ void force(Particle &p1, Particle &p2, double force_constant, double damping_con
         double xi = r1 + r2 - rr;
 
         if (xi > 0) { // If overlapping
+
+            double Y = p1._youngs_modulus;
+            double poisson = p1._poisson;
+            double force_constant = 2*Y*sqrt(r1)/(3*(1-poisson*poisson));
+
             double sqrt_xi = sqrt(xi);
             double rr_rez = 1 / rr;
 
@@ -36,7 +41,7 @@ void force(Particle &p1, Particle &p2, double force_constant, double damping_con
             double xidot = -(ex * dvx + ey * dvy + ez*dvz);
 
             double elastic_force = force_constant * xi * sqrt_xi;
-            double dissipative_force = force_constant * damping_constant * sqrt_xi * xidot;
+            double dissipative_force = force_constant * p1._damping_constant * sqrt_xi * xidot;
             double fn = elastic_force + dissipative_force;
 
             if (fn < 0) fn = 0;
@@ -55,7 +60,7 @@ void Particle::periodic_bc(double x_0, double y_0, double lx, double ly) {
     while (rtd0.y() > y_0 + ly) rtd0.y() -= ly;
 }
 
-void force(Particle &p, Particle &b, BasePlate &basePlate, double force_constant, double damping_constant) {
+void force(Particle &p, Particle &b, BasePlate &basePlate) {
     double dx = p.x() - b.x();
     double dy = p.y() - b.y();
     double dz = p.z() - basePlate.z();
@@ -67,6 +72,9 @@ void force(Particle &p, Particle &b, BasePlate &basePlate, double force_constant
         // Overlap
         double xi = r1 + r2 - rr;
         if (xi > 0) {
+            double force_constant = 4*sqrt(p.r())/3*(1/((1-p._poisson*p._poisson)/p._youngs_modulus + (1-b._poisson*b._poisson)/b._youngs_modulus));
+            double damping_constant = (p._damping_constant + b._damping_constant)/2;
+
             double sqrt_xi = sqrt(xi);
             double rr_rez = 1 / rr;
 
