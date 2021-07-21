@@ -14,17 +14,13 @@
 #include "BasePlate.h"
 #include <random>
 #include <chrono>
+#include "Options.h"
 
 typedef  std::vector<std::vector<double>> my_vector_of_vectors_t;
 
 namespace fs = std::filesystem;
 
 const double SQRT3 = sqrt(3);
-
-struct ProgramOptions {
-    fs::path savepath;
-    int save_interval;
-};
 
 class Engine {
 
@@ -35,7 +31,7 @@ public:
      * \param fname Filename of initialisation data
      * \param options Struct containing various options for the program
      */
-     Engine(const char* fname, ProgramOptions& options);
+     Engine(Options& options);
 
      ///Iterates the simulation by one timestep
      void step();
@@ -45,7 +41,7 @@ public:
 private:
     /// Setup the system
 
-    void read_system_params(const char* fname);
+//    void read_system_params(const char* fname);
 
     void init_system();
 
@@ -101,7 +97,7 @@ private:
     std::vector<Particle> particles;
     std::vector<Particle> base_particles;
 //    std::unique_ptr<my_kd_tree_t> tree;
-    ProgramOptions _options;
+    Options _options;
     my_vector_of_vectors_t base_particles_for_tree;
     size_t no_of_base_particles{0};
 
@@ -111,35 +107,13 @@ private:
     std::FILE* f1;
 
     double timestep{0};
-    double lx{0};
-    double ly{0};
-    double lz{0};
-    double x_0{0.0};
-    double y_0{0.0};
-    double z_0{0.0};
-    double dimple_rad{0};
-    double dimple_spacing{0};
-    double dimple_depth{0};
-    double base_height{0};
-    double ball_rad{0};
-    double base_rad{0};
-    double ball_mass{0};
-    double base_mass{0};
-    double ball_height{0};
-    double ball_youngs{0};
-    double ball_poisson{0};
-    double base_youngs{0};
-    double base_poisson{0};
-    double ball_base_normal_constant{0};
-    double ball_base_damping_constant{0};
-    double area_fraction{0};
-    double ball_normal_constant{0};
-    double ball_damping_constant{0};
-    double base_damping_constant{0};
 
     double Time{0};
     Vector G{0, 0, -9.81};
     BasePlate basePlate{0, 0, 0};
+    double lx;
+    double ly;
+    double lz;
 
     std::chrono::steady_clock::time_point begin;
 

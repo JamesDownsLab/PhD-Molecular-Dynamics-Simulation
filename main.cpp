@@ -1,36 +1,27 @@
 #include <iostream>
 #include "Engine.h"
-#include <sstream>
 #include <string>
+#include "Options.h"
+
 
 int main(int argc, char** argv){
-    int steps{1000};
-    int save_interval{100};
+    const char* fname;
     for (int i = 0; i<argc; i++){
         std::cout << argv[i] << "\n";
         std::string command = argv[i];
-        if (command == "--steps"){
-            steps = atoi(argv[i+1]);
-            i++;
-        }
-        if (command == "--save_interval"){
-            save_interval = atoi(argv[i+1]);
-            i++;
+        if (command == "--in"){
+            fname = argv[i+1];
         }
     }
 
-    ProgramOptions options{
-            "data.dump",
-            save_interval
-    };
-//    setup_experiment(0.8);
-    Engine engine("initial.data", options);
-    engine.set_baseplate(1.5e-4, 0.02);
-    for (int s{0}; s <= steps; s++) {
-        engine.step();
-    }
-    engine.set_baseplate(1e-10, 0.02);
-    for (int s{0}; s <= steps; s++) {
-        engine.step();
+    Options options = read_input_file(fname);
+    Engine engine(options);
+
+
+    if (options.programOptions.experiment == "stable") {
+        engine.set_baseplate(1.5e-4, 0.02);
+        for (int s{0}; s <= options.programOptions.steps; s++) {
+            engine.step();
+        }
     }
 }

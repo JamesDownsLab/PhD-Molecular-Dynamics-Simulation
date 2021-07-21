@@ -6,14 +6,14 @@
 
 #include <memory>
 
-Engine::Engine(const char *fname, ProgramOptions& options)
-        : _options{options} {
+Engine::Engine(Options& options)
+        : _options{options}, lx{options.systemProps.lx}, ly{options.systemProps.ly}, lz{options.systemProps.lz}{
     begin = std::chrono::steady_clock::now();
-    f1 = fopen(_options.savepath.string().c_str(), "w");
-    read_system_params("params.txt");
+    timestep = options.programOptions.timestep;
+    f1 = fopen(_options.programOptions.savepath.string().c_str(), "w");
     init_system();
 
-    basePlate.set_zi(base_height);
+    basePlate.set_zi(_options.systemProps.base_height);
 }
 
 void Engine::init_system() {
@@ -72,12 +72,12 @@ void Engine::integrate() {
     std::for_each(particles.begin(), particles.end(),
                   [&](Particle& p){
 //        p.velocity_verlet(timestep, G, ball_mass);
-            p.correct(timestep, G, ball_mass);
+            p.correct(timestep, G);
     });
 
     // Apply periodic boundary conditions
     std::for_each(particles.begin(), particles.end(),
-                  [&](Particle& p) {p.periodic_bc(x_0, y_0, lx, ly);});
+                  [&](Particle& p) {p.periodic_bc(0, 0, lx, ly);});
 
     Time += timestep;
 }
@@ -117,8 +117,8 @@ void Engine::make_ilist() {
     for (unsigned int i{0}; i<no_of_particles; i++){
         double x = particles[i].x();
         double y = particles[i].y();
-        int ix = int((x-x_0) / gk);
-        int iy = int((y-y_0) / gk);
+        int ix = int(x / gk);
+        int iy = int(y / gk);
         pindex[ix][iy] = (int)i;
         partners[i].clear();
     }
@@ -127,9 +127,9 @@ void Engine::make_ilist() {
     for (unsigned int i{ 0 }; i < no_of_particles; i++) {
         double x = particles[i].x();
         double y = particles[i].y();
-        if ((x >= x_0) && (x < x_0 + lx) && (y >= y_0) && (y < y_0 + ly)) {
-            int ix = int((x - x_0) / gk);
-            int iy = int((y - y_0) / gk);
+        if ((x >= 0.0) && (x < lx) && (y >= 0.0) && (y < ly)) {
+            int ix = int(x / gk);
+            int iy = int(y / gk);
             // Check the adjacent gm lattice sites for particles
             for (int dx = -gm; dx <= gm; dx++) {
                 for (int dy = -gm; dy <= gm; dy++) {
@@ -151,8 +151,8 @@ bool Engine::ilist_needs_update() {
     for (unsigned int i{ 0 }; i < no_of_particles; i++) {
         double x = particles[i].x();
         double y = particles[i].y();
-        int ix = int((x - x_0) / gk);
-        int iy = int((y - y_0) / gk);
+        int ix = int(x / gk);
+        int iy = int(y/ gk);
         if (pindex.at(ix).at(iy) != i) {
             clear_pindex();
             return true;
@@ -175,7 +175,7 @@ void Engine::make_forces() {
     for (unsigned int i{ 0 }; i < no_of_particles; i++) {
         for (unsigned int k{ 0 }; k < partners[i].size(); k++) {
             int pk = partners[i][k];
-            force(particles[i], particles[pk], lx, ly, lz);
+            force(particles[i], particles[pk], _options.systemProps.lx, _options.systemProps.ly, _options.systemProps.lz);
         }
     }
 }
@@ -183,7 +183,9 @@ void Engine::make_forces() {
 void Engine::make_plate_forces() {
     for (auto& p: particles){
         double z = p.z();
-        if (z-basePlate.z() < ball_rad+base_rad) {
+        double r1 = _options.baseProps.radius;
+        double r2 = _options.ballProps.radius;
+        if (z-basePlate.z() < r1+r2) {
             double x = p.x();
             double y = p.y();
             int ix = int(x / gk_base);
@@ -203,7 +205,7 @@ void Engine::make_plate_forces() {
 }
 
 void Engine::check_dump() {
-    if (save != _options.save_interval) {
+    if (save != _options.programOptions.save_interval) {
         save++;
     }
     else {
@@ -212,83 +214,11 @@ void Engine::check_dump() {
     }
 }
 
-void Engine::read_system_params(const char *fname) {
-
-    std::ifstream fparticle{fname};
-    // Read the system properties
-    while (fparticle.peek() == '#'){
-        std::string type;
-        fparticle >> type;
-
-        if (type == "#timestep:"){
-            fparticle >> timestep;
-            std::cout << "Timestep = " << timestep << std::endl;
-        }
-        else if (type == "#lx:"){
-            fparticle >> lx;
-        }
-        else if (type == "#ly:"){
-            fparticle >> ly;
-        }
-        else if (type == "#lz:"){
-            fparticle >> lz;
-        }
-        else if (type == "#dimple_rad:"){
-            fparticle >> dimple_rad;
-        }
-        else if (type == "#dimple_spacing:"){
-            fparticle >> dimple_spacing;
-        }
-        else if (type == "#dimple_depth:"){
-            fparticle >> dimple_depth;
-        }
-        else if (type == "#base_height:"){
-            fparticle >> base_height;
-        }
-        else if (type == "#ball_youngs:"){
-            fparticle >> ball_youngs;
-        }
-        else if (type == "#ball_poisson:"){
-            fparticle >> ball_poisson;
-        }
-        else if (type == "#base_youngs:"){
-            fparticle >> base_youngs;
-        }
-        else if (type == "#base_poisson:"){
-            fparticle >> base_poisson;
-        }
-        else if(type == "#ball_rad:"){
-            fparticle >> ball_rad;
-        }
-        else if (type == "#base_rad:"){
-            fparticle >> base_rad;
-        }
-        else if (type == "#area_fraction:"){
-            fparticle >> area_fraction;
-        }
-        else if (type == "#ball_height:"){
-            fparticle >> ball_height;
-        }
-        else if (type == "#ball_mass:"){
-            fparticle >> ball_mass;
-        }
-        else if (type == "#ball_damping:"){
-            fparticle >> ball_damping_constant;
-        }
-        else if (type == "#base_damping:"){
-            fparticle >> base_damping_constant;
-        }
-        else {
-            std::cout << "Unknown type: " << type << std::endl;
-        }
-        fparticle.ignore(100, '\n');
-    }
-
-}
 
 void Engine::add_particles() {
-    double dx = 2*ball_rad;
-    double dy = 2*ball_rad*sqrt(3.0)/2.0;
+    double r = _options.ballProps.radius;
+    double dx = 2*r;
+    double dy = 2*r*sqrt(3.0)/2.0;
     int nx = floor(lx / dx);
     int ny = floor(ly / dy);
 
@@ -300,7 +230,9 @@ void Engine::add_particles() {
         for (int j{0}; j < ny; j++){
             double x = double(i)*dx + double(j%2)*dx/2.0;
             double y = double(j)*dy;
-            Particle pp(x, y, ball_height, ball_rad, ball_mass, ball_youngs, ball_poisson, ball_damping_constant);
+            double z = _options.systemProps.ball_height;
+            Particle pp(x, y, z, _options.ballProps);
+            double area_fraction = _options.systemProps.area_fraction;
             if (distr(eng) < area_fraction) {
                 particles.push_back(pp);
             }
@@ -310,15 +242,18 @@ void Engine::add_particles() {
 }
 
 void Engine::add_base_particles() {
-    double dx = 2*base_rad;
-    double dy = 2*base_rad*sqrt(3.0)/2.0;
+    double r = _options.baseProps.radius;
+    double dx = 2*r;
+    double dy = 2*r*sqrt(3.0)/2.0;
+
     int nx = floor(lx / dx);
     int ny = floor(ly / dy);
     for (int i{0}; i < nx; i++){
         for (int j{0}; j < ny; j++){
             double x = double(i)*dx + double(j%2)*dx/2.0;
             double y = double(j)*dy;
-            Particle pp(x, y, base_height, base_rad, base_mass, base_youngs, base_poisson, base_damping_constant);
+            double z = _options.systemProps.base_height;
+            Particle pp(x, y, z, _options.baseProps);
             base_particles.push_back(pp);
         }
     }

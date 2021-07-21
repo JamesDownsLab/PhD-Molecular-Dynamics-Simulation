@@ -117,7 +117,7 @@ void Particle::predict(double dt) {
     rtd3 += a1*rtd4;
 }
 
-void Particle::correct(double dt, Vector G, double mass) {
+void Particle::correct(double dt, Vector G) {
 
     static Vector accel, corr;
 
@@ -127,7 +127,7 @@ void Particle::correct(double dt, Vector G, double mass) {
     const double coeff3 = double(1)/double(2)*(double(3)*dtrez);
     const double coeff4 = double(1)/double(12)*(double(12)*(dtrez*dtrez));
 
-    accel = Vector((1/mass)*_force.x()+G.x(), (1/mass)*_force.y()+G.y(), (1/mass)*_force.z()+G.z());
+    accel = Vector((1/_m)*_force.x()+G.x(), (1/_m)*_force.y()+G.y(), (1/_m)*_force.z()+G.z());
     corr = accel - rtd2;
     rtd0 += coeff0*corr;
     rtd1 += coeff1*corr;

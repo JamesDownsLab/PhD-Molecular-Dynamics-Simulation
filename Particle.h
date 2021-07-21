@@ -8,6 +8,7 @@
 #include <iostream>
 #include "Vector.h"
 #include "BasePlate.h"
+#include "Options.h"
 
 inline double normalize(double dx, double L) {
     while (dx < -L / 2) dx += L;
@@ -21,8 +22,8 @@ class Particle {
 
 
 public:
-    Particle(double x, double y, double z, double r, double m, double Y, double poisson, double damping) :
-        rtd0(x, y, z), rtd1(null_vec), rtd2(null_vec), _r(r), _m(m), _youngs_modulus(Y), _poisson(poisson), _damping_constant(damping){
+    Particle(double x, double y, double z, ParticleProps props) :
+        rtd0(x, y, z), rtd1(null_vec), rtd2(null_vec), _r(props.radius), _m(props.mass), _youngs_modulus(props.youngs_modulus), _poisson(props.poisson), _damping_constant(props.damping_factor){
     }
     Particle(const Particle& rhs) = default;
     Particle(Particle && rhs) = default;
@@ -60,7 +61,7 @@ public:
     void set_force_to_zero() { _force = null_vec;}
 
     void predict(double dt);
-    void correct(double dt, Vector G, double mass);
+    void correct(double dt, Vector G);
 
 private:
     Vector rtd0{null_vec}, rtd1{null_vec}, rtd2{null_vec}, rtd3{null_vec}, rtd4{null_vec};
