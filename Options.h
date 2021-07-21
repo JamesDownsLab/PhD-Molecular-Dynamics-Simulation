@@ -15,6 +15,7 @@ struct ProgramOptions {
     int save_interval{0};
     double timestep{0};
     std::string experiment{""};
+    double amplitude;
 };
 
 struct SystemProps {

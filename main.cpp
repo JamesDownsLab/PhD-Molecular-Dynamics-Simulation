@@ -19,7 +19,7 @@ int main(int argc, char** argv){
 
 
     if (options.programOptions.experiment == "stable") {
-        engine.set_baseplate(1.5e-4, 0.02);
+        engine.set_baseplate(options.programOptions.amplitude, 0.02);
         for (int s{0}; s <= options.programOptions.steps; s++) {
             engine.step();
         }

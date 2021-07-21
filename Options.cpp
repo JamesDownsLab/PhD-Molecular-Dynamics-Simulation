@@ -31,6 +31,9 @@ Options read_input_file(const char* fname){
         else if (type == "#experiment:"){
             stream >> programOptions.experiment;
         }
+        else if (type == "#amplitude:"){
+            stream >> programOptions.amplitude;
+        }
         else if (type == "#lx:"){
             stream >> systemProps.lx;
         }
