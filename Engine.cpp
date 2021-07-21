@@ -190,8 +190,12 @@ void Engine::make_plate_forces() {
             int iy = int(y / gk_base);
             for (int dx = -gm_base; dx <= gm_base; dx++) {
                 for (int dy = -gm_base; dy <= gm_base; dy++) {
-                    size_t k = pindex_base[(ix + dx + nx_base) % nx_base][(iy + dy + ny_base) % ny_base];
-                    force(p, base_particles.at(k), basePlate);
+                    int iix = (ix + dx + nx_base) % (nx_base);
+                    int iiy = (iy + dy + ny_base) % (ny_base);
+                    int k = pindex_base[iix][iiy];
+                    if (k>0) {
+                        force(p, base_particles.at(k), basePlate);
+                    }
                 }
             }
         }
@@ -335,17 +339,17 @@ void Engine::init_lattice_algorithm_for_base_particles() {
     }
     clear_pindex_base();
 
-    for (size_t i=0; i<base_particles.size(); i++) {
+    for (int i=0; i<base_particles.size(); i++) {
         double x = base_particles[i].x();
         double y = base_particles[i].y();
-        size_t ix = int(x/gk_base);
-        size_t iy = int(y/gk_base);
+        int ix = int(x/gk_base);
+        int iy = int(y/gk_base);
         pindex_base.at(ix).at(iy)=i;
     }
 }
 
 void Engine::clear_pindex_base() {
-    for (auto &px: pindex) {
+    for (auto &px: pindex_base) {
         for (auto &py: px) {
             py = -1;
         }

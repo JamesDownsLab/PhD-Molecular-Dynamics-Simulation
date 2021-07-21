@@ -88,7 +88,7 @@ private:
     int gm{0}, Nx{0}, Ny{0};
     int gm_base{0}, nx_base{0}, ny_base{0};
 
-    std::vector<std::vector<size_t>> pindex_base;
+    std::vector<std::vector<int>> pindex_base;
 
     void dump();
     void check_dump();
