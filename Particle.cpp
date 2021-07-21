@@ -45,10 +45,6 @@ void force(Particle &p1, Particle &p2, double lx, double ly, double lz) {
             double dissipative_force = force_constant * p1._damping_constant * sqrt_xi * xidot;
             double fn = elastic_force + dissipative_force;
 
-            if (xi>1e-3){
-                std::cout << "Significant Overlap, force = " << fn << std::endl;
-
-            }
 
             if (fn < 0) fn = 0;
             p1.add_force(Vector(fn * ex, fn*ey, fn*ez));
