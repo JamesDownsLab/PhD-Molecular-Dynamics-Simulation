@@ -16,13 +16,14 @@ inline double normalize(double dx, double L) {
 }
 
 class Particle {
-    friend std::istream& operator >> (std::istream& is, Particle& p);
     friend void force(Particle& p1, Particle& p2, double force_constant, double damping_constant, double lx, double ly, double lz);
     friend void force(Particle& p, Particle& b, BasePlate& basePlate, double force_constant, double damping_constant);
 
 
 public:
-    Particle(double x, double y, double z, double r) : rtd0(x, y, z), rtd1(null_vec), rtd2(null_vec), _r(r){}
+    Particle(double x, double y, double z, double r, double m, double Y, double poisson, double damping) :
+        rtd0(x, y, z), rtd1(null_vec), rtd2(null_vec), _r(r), _m(m), _youngs_modulus(Y), _poisson(poisson), _damping_constant(damping){
+    }
     Particle(const Particle& rhs) = default;
     Particle(Particle && rhs) = default;
     Particle& operator=(const Particle & rhs) = default;
@@ -64,6 +65,10 @@ public:
 private:
     Vector rtd0{null_vec}, rtd1{null_vec}, rtd2{null_vec}, rtd3{null_vec}, rtd4{null_vec};
     Vector _force{null_vec};
-    double _r{0}, _m{0}, _youngs_modulus{0}, _poisson{0}, _coeff_res{0}, _coeff_fric{0}, _damping_constant{0}, _force_constant{0};
+    double _r;
+    double _m;
+    double _youngs_modulus;
+    double _poisson;
+    double _damping_constant;
 };
 #endif //INC_3DMOLECULARDYNAMICS_PARTICLE_H

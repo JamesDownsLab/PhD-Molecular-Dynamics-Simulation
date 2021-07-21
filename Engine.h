@@ -124,6 +124,7 @@ private:
     double ball_rad{0};
     double base_rad{0};
     double ball_mass{0};
+    double base_mass{0};
     double ball_height{0};
     double ball_youngs{0};
     double ball_poisson{0};
@@ -134,9 +135,8 @@ private:
     double area_fraction{0};
     double ball_normal_constant{0};
     double ball_damping_constant{0};
+    double base_damping_constant{0};
 
-    double _base_amplitude{0};
-    double _base_period{0};
     double Time{0};
     Vector G{0, 0, -9.81};
     BasePlate basePlate{0, 0, 0};

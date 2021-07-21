@@ -19,8 +19,6 @@ Engine::Engine(const char *fname, ProgramOptions& options)
                     (1/((1-ball_poisson*ball_poisson)/ball_youngs + (1-base_poisson*base_poisson)/base_youngs));
 
     ball_normal_constant = 2*ball_youngs * sqrt(ball_rad)/(3*(1-ball_poisson*ball_poisson));
-    ball_damping_constant = 0.00001;
-    ball_base_damping_constant = 0.01;
 }
 
 void Engine::init_system() {
@@ -275,6 +273,12 @@ void Engine::read_system_params(const char *fname) {
         else if (type == "#ball_mass:"){
             fparticle >> ball_mass;
         }
+        else if (type == "#ball_damping:"){
+            fparticle >> ball_damping_constant;
+        }
+        else if (type == "#base_damping:"){
+            fparticle >> base_damping_constant;
+        }
         else {
             std::cout << "Unknown type: " << type << std::endl;
         }
@@ -297,7 +301,7 @@ void Engine::add_particles() {
         for (int j{0}; j < ny; j++){
             double x = double(i)*dx + double(j%2)*dx/2.0;
             double y = double(j)*dy;
-            Particle pp(x, y, ball_height, ball_rad);
+            Particle pp(x, y, ball_height, ball_rad, ball_mass, ball_youngs, ball_poisson, ball_damping_constant);
             if (distr(eng) < area_fraction) {
                 particles.push_back(pp);
             }
@@ -315,7 +319,7 @@ void Engine::add_base_particles() {
         for (int j{0}; j < ny; j++){
             double x = double(i)*dx + double(j%2)*dx/2.0;
             double y = double(j)*dy;
-            Particle pp(x, y, base_height, base_rad);
+            Particle pp(x, y, base_height, base_rad, base_mass, base_youngs, base_poisson, base_damping_constant);
             base_particles.push_back(pp);
         }
     }
