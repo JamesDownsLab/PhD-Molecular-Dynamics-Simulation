@@ -24,4 +24,18 @@ int main(int argc, char** argv){
             engine.step();
         }
     }
+
+    else if (options.programOptions.experiment == "startstop"){
+        engine.set_baseplate(options.programOptions.amplitude, 0.02);
+        for (int s{0}; s <= options.programOptions.steps/2; s++) {
+            engine.step();
+        }
+        for (int s{0}; s<=options.programOptions.steps/2; s++){
+            engine.step();
+        }
+    }
+
+    else {
+        std::cout << "Experiment not specified" << std::endl;
+    }
 }
