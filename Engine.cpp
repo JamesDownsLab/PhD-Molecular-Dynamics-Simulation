@@ -14,12 +14,14 @@ Engine::Engine(Options& options)
     init_system();
 
     basePlate.set_zi(_options.systemProps.base_height);
+    dump();
 }
 
 void Engine::init_system() {
     add_particles();
     add_base_particles();
-    dump();
+    create_dimples();
+
     init_lattice_algorithm();
     init_lattice_algorithm_for_base_particles();
 }
@@ -39,7 +41,7 @@ void Engine::dump() {
         std::fprintf(f1, "%.9f %.9f %.9f %.9f %.9f %.9f %.9f %d\n", p.x(), p.y(), p.z(), p.vx(), p.vy(), p.vz(), p.r(), 0);
     }
     for (Particle& p: base_particles) {
-        std::fprintf(f1, "%.9f %.9f %.9f %.9f %.9f %.9f %.9f %d\n", p.x(), p.y(), basePlate.z(), p.vx(), p.vy(), basePlate.vz(), p.r(), 1);
+        std::fprintf(f1, "%.9f %.9f %.9f %.9f %.9f %.9f %.9f %d\n", p.x(), p.y(), p.z() + basePlate.z(), p.vx(), p.vy(), basePlate.vz(), p.r(), 1);
     }
 }
 
@@ -260,6 +262,8 @@ void Engine::add_base_particles() {
     no_of_base_particles = base_particles.size();
 }
 
+
+
 void Engine::init_lattice_algorithm_for_base_particles() {
     r_base = base_particles.at(0).r();
     gk_base = sqrt(2)*r_base;
@@ -288,5 +292,42 @@ void Engine::clear_pindex_base() {
         for (auto &py: px) {
             py = -1;
         }
+    }
+}
+
+void Engine::create_dimples() {
+
+    // Make kd tree of base particles
+    my_vector_of_vectors_t tree_input;
+    for (auto &p: base_particles) {
+        tree_input.push_back({p.x(), p.y()});
+    }
+    const size_t dims{2};
+    auto tree = my_kd_tree_t{dims, tree_input, 10};
+    tree.index->buildIndex();
+
+
+    double L = _options.systemProps.dimple_spacing;
+    double dx = L;
+    double dy = L * sqrt(3) / 2;
+
+    int nx = floor(lx / dx);
+    int ny = floor(ly / dy);
+    for (int i{0}; i < nx; i++) {
+        for (int j{0}; j < ny; j++) {
+            double x = double(i) * dx + double(j % 2) * dx / 2.0;
+            double y = double(j) * dy;
+            const double query_pt[2] = {x, y};
+
+            std::vector<std::pair<size_t, double>> ret_matches;
+            nanoflann::SearchParams params;
+            const size_t nMatches = tree.index->radiusSearch(&query_pt[0], _options.systemProps.dimple_radius*_options.systemProps.dimple_radius,
+                                                             ret_matches, params);
+            for (int n{0}; n < nMatches; n++) {
+                size_t index = ret_matches[n].first;
+                base_particles[index].set_z(-_options.systemProps.dimple_depth);
+            }
+        }
+
     }
 }

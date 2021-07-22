@@ -59,6 +59,7 @@ public:
     void add_force(const Vector& f) {_force += f;}
     void periodic_bc(double x_0, double y_0, double lx, double ly);
     void set_force_to_zero() { _force = null_vec;}
+    void set_z(double z) {rtd0 += Vector(0, 0, z);}
 
     void predict(double dt);
     void correct(double dt, Vector G);

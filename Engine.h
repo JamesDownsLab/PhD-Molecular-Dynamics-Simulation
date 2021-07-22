@@ -15,8 +15,11 @@
 #include <random>
 #include <chrono>
 #include "Options.h"
+#include "nanoflann.h"
+#include "KDTreeVectorOfVectorsAdaptor.h"
 
 typedef  std::vector<std::vector<double>> my_vector_of_vectors_t;
+typedef KDTreeVectorOfVectorsAdaptor<my_vector_of_vectors_t, double> my_kd_tree_t;
 
 namespace fs = std::filesystem;
 
@@ -48,6 +51,8 @@ private:
     void add_particles();
 
     void add_base_particles();
+
+    void create_dimples();
 
     /// Calculate the collisional forces between all particles
     void make_forces();
