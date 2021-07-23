@@ -45,6 +45,15 @@ class Vector {
     friend double scalprod3d(const Vector& v1, const Vector& v2) {
         return v1._x * v2._x + v1._y * v2._y + v1._z * v2._z;
     }
+    friend Vector vecprod3d(const Vector& v1, const Vector& v2){
+        Vector vec(v1._y*v2._z-v1._z*v2._y,
+                   -v1._x*v2._z+v1._z*v2._x,
+                   v1._x*v2._y-v1._y*v2._x);
+        return vec;
+    }
+    friend Vector sqrt(const Vector& v){
+        return Vector(sqrt(v._x), sqrt(v._y), sqrt(v._z));
+    }
 
 
 public:

@@ -61,8 +61,10 @@ public:
     /// Setters
     ///////////////////////////////////////
     void add_force(const Vector& f) {_force += f;}
+    void add_torque(const Vector & t) {_torque += t;}
     void periodic_bc(double x_0, double y_0, double lx, double ly);
     void set_force_to_zero() { _force = null_vec;}
+    void set_torque_to_zero() {_torque = null_vec;}
     void set_z(double z) {rtd0 += Vector(0, 0, z);}
 
     ///////////////////////////////////////
@@ -74,6 +76,7 @@ public:
 private:
     Vector rtd0{null_vec}, rtd1{null_vec}, rtd2{null_vec}, rtd3{null_vec}, rtd4{null_vec};
     Vector _force{null_vec};
+    Vector _torque{null_vec};
     double _r;
     double _m;
     double _youngs_modulus;

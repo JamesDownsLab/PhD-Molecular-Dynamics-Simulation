@@ -3,6 +3,7 @@
 //
 
 #include "Particle.h"
+#include "Vector.h"
 #include <cmath>
 
 
@@ -18,7 +19,8 @@ void force(Particle &p1, Particle &p2, double lx, double ly, double lz) {
         // Overlap
         double xi = r1 + r2 - rr;
 
-        if (xi > 0) { // If overlapping
+        if (xi > 1e-10) { // If overlapping
+
 
 
             double Y = p1._youngs_modulus;
@@ -33,27 +35,52 @@ void force(Particle &p1, Particle &p2, double lx, double ly, double lz) {
             double ey = dy * rr_rez;
             double ez = dz * rr_rez;
 
-            // Relative velocities
             double dvx = p1.vx() - p2.vx();
             double dvy = p1.vy() - p2.vy();
             double dvz = p1.vz() - p2.vz();
 
-            // Overlap rate
+            Vector n = {ex, ey, ez};
+
+            Vector v1 = p1.rtd1;
+            Vector v2 = p2.rtd1;
+            Vector omega1 = {0, 0, 0};
+            Vector omega2 = {0, 0, 0};
+            Vector vrel = v1 - v2 - vecprod3d(r1*omega1 + r2*omega2, n);
+            Vector vtrel = vrel - scalprod3d(vrel, n)*n;
+            Vector t = vtrel * (1/norm3d(vtrel));
+
             double xidot = -(ex * dvx + ey * dvy + ez*dvz);
 
+            double gamma = 0.1;
+
+            // Normal Forces
             double elastic_force = force_constant * xi * sqrt_xi;
             double dissipative_force = force_constant * p1._damping_constant * sqrt_xi * xidot;
             double fn = elastic_force + dissipative_force;
-
-
             if (fn < 0) fn = 0;
-            p1.add_force(Vector(fn * ex, fn*ey, fn*ez));
-            p2.add_force(Vector(-fn*ex, -fn*ey, -fn*ez));
+
+            // Tangential forces
+            double mu = 0.5;
+            double ft = -gamma * xidot;
+            if (ft < -mu*fn) ft = -mu*fn;
+            if (ft>mu*fn) ft = mu*fn;
+
+            // Total force
+            Vector force = fn*n + ft*t;
+
+            Vector torque = vecprod3d(force, n);
+
+            p1.add_force(force);
+            p2.add_force(-1*force);
+
+            p1.add_torque(torque);
+            p2.add_torque(-1*torque);
 
 
         }
     }
 }
+
 
 void Particle::periodic_bc(double x_0, double y_0, double lx, double ly) {
     while (rtd0.x() < x_0) rtd0.x() += lx;

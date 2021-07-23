@@ -61,6 +61,7 @@ void Engine::integrate() {
     std::for_each(particles.begin(), particles.end(),
                   [&](Particle& p){
         p.set_force_to_zero();
+        p.set_torque_to_zero();
         p.predict(timestep);
     });
 
