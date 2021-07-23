@@ -17,14 +17,18 @@ inline double normalize(double dx, double L) {
 }
 
 class Particle {
+    //////////////////////
+    /// Force calculation
+    //////////////////////
     friend void force(Particle& p1, Particle& p2, double lx, double ly, double lz);
     friend void force(Particle& p, Particle& b, BasePlate& basePlate);
 
 
 public:
     Particle(double x, double y, double z, ParticleProps props) :
-        rtd0(x, y, z), rtd1(null_vec), rtd2(null_vec), _r(props.radius), _m(props.mass), _youngs_modulus(props.youngs_modulus), _poisson(props.poisson), _damping_constant(props.damping_factor){
-    }
+        rtd0(x, y, z), rtd1(null_vec), rtd2(null_vec), _r(props.radius),
+        _m(props.mass), _youngs_modulus(props.youngs_modulus), _poisson(props.poisson),
+        _damping_constant(props.damping_factor){}
     Particle(const Particle& rhs) = default;
     Particle(Particle && rhs) = default;
     Particle& operator=(const Particle & rhs) = default;
@@ -61,6 +65,9 @@ public:
     void set_force_to_zero() { _force = null_vec;}
     void set_z(double z) {rtd0 += Vector(0, 0, z);}
 
+    ///////////////////////////////////////
+    /// Integration
+    ////////////////////////////////////
     void predict(double dt);
     void correct(double dt, Vector G);
 
