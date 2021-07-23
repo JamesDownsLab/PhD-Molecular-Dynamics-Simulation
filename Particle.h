@@ -28,7 +28,7 @@ public:
     Particle(double x, double y, double z, ParticleProps props) :
         rtd0(x, y, z), rtd1(null_vec), rtd2(null_vec), _r(props.radius),
         _m(props.mass), _youngs_modulus(props.youngs_modulus), _poisson(props.poisson),
-        _damping_constant(props.damping_factor){}
+        _damping_constant(props.damping_factor){J = 0.4*_m*_r*_r;}
     Particle(const Particle& rhs) = default;
     Particle(Particle && rhs) = default;
     Particle& operator=(const Particle & rhs) = default;
@@ -75,6 +75,7 @@ public:
 
 private:
     Vector rtd0{null_vec}, rtd1{null_vec}, rtd2{null_vec}, rtd3{null_vec}, rtd4{null_vec};
+    Vector rot0{null_vec}, rot1{null_vec}, rot2{null_vec}, rot3{null_vec}, rot4{null_vec};
     Vector _force{null_vec};
     Vector _torque{null_vec};
     double _r;
@@ -82,5 +83,6 @@ private:
     double _youngs_modulus;
     double _poisson;
     double _damping_constant;
+    double J{0};
 };
 #endif //INC_3DMOLECULARDYNAMICS_PARTICLE_H

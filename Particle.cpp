@@ -142,11 +142,16 @@ void Particle::predict(double dt) {
     rtd1 += a1*rtd2 + a2*rtd3 + a3*rtd4;
     rtd2 += a1*rtd3 + a2*rtd4;
     rtd3 += a1*rtd4;
+
+    rot0 += a1*rot1 + a2*rot2 + a3*rot3 + a4*rot4;
+    rot1 += a1*rot2 + a2*rot3 + a3*rot4;
+    rot2 += a1*rot3 + a2*rot4;
+    rot3 += a1*rot4;
 }
 
 void Particle::correct(double dt, Vector G) {
 
-    static Vector accel, corr;
+    static Vector accel, corr, rot_accel, rot_corr;
 
     double dtrez = 1/dt;
     const double coeff0 = double(19)/double(90) * (dt*dt/double(2));
@@ -161,4 +166,12 @@ void Particle::correct(double dt, Vector G) {
     rtd2 = accel;
     rtd3 += coeff3*corr;
     rtd4 += coeff4*corr;
+
+    rot_accel = _torque * (1/J);
+    rot_corr = rot_accel - rot2;
+    rot0 += coeff0*rot_corr;
+    rot1 += coeff1*rot_corr;
+    rot2 = rot_accel;
+    rot3 += coeff3*rot_corr;
+    rot4 += coeff4*rot_corr;
 }
