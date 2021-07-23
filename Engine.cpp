@@ -271,7 +271,6 @@ void Engine::init_lattice_algorithm_for_base_particles() {
     nx_base = int(lx/gk_base)+1;
     ny_base = int(ly/gk_base)+1;
 
-    partners_base.resize(no_of_particles);
     pindex_base.resize(nx_base);
     for (auto & px : pindex_base){
         px.resize(ny_base);
