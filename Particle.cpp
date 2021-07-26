@@ -43,8 +43,8 @@ void force(Particle &p1, Particle &p2, double lx, double ly, double lz) {
 
             Vector v1 = p1.rtd1;
             Vector v2 = p2.rtd1;
-            Vector omega1 = {0, 0, 0};
-            Vector omega2 = {0, 0, 0};
+            Vector omega1 = p1.rot1;
+            Vector omega2 = p2.rot2;
             Vector vrel = v1 - v2 - vecprod3d(r1*omega1 + r2*omega2, n);
             Vector vtrel = vrel - scalprod3d(vrel, n)*n;
             Vector t = vtrel * (1/norm3d(vtrel));
