@@ -92,7 +92,7 @@ void Particle::periodic_bc(double x_0, double y_0, double lx, double ly) {
 void force(Particle &p, Particle &b, BasePlate &basePlate) {
     double dx = p.x() - b.x();
     double dy = p.y() - b.y();
-    double dz = p.z() - basePlate.z();
+    double dz = p.z() - (basePlate.z()+b.z());
     if (std::abs(dx) < p.r() + b.r() && std::abs(dy) < p.r() + b.r() && std::abs(dz) < p.r() + b.r()) {
         double rr = sqrt(dx*dx + dy*dy + dz*dz);
         double r1 = p.r();
@@ -100,14 +100,15 @@ void force(Particle &p, Particle &b, BasePlate &basePlate) {
 
         // Overlap
         double xi = r1 + r2 - rr;
-        if (xi > 0) {
-            double force_constant = 4*sqrt(p.r())/3*(1/((1-p._poisson*p._poisson)/p._youngs_modulus + (1-b._poisson*b._poisson)/b._youngs_modulus));
-            double damping_constant = (p._damping_constant + b._damping_constant)/2;
-
+        if (xi > 1e-10) {
+            double Y = (p._youngs_modulus*b._youngs_modulus)/(p._youngs_modulus+b._youngs_modulus);
+            double poisson = 0.5*(p._poisson+b._poisson);
+            double A = 0.5*(p._damping_constant + b._damping_constant);
+            double force_constant = 2*Y*sqrt(r1)/(3*(1-poisson*poisson));
             double sqrt_xi = sqrt(xi);
-            double rr_rez = 1 / rr;
 
             // Unit vectors
+            double rr_rez = 1/rr;
             double ex = dx * rr_rez;
             double ey = dy * rr_rez;
             double ez = dz * rr_rez;
@@ -117,17 +118,72 @@ void force(Particle &p, Particle &b, BasePlate &basePlate) {
             double dvy = p.vy();
             double dvz = p.vz() - basePlate.vz();
 
-            // Overlap rate
-            double xidot = -(ex * dvx + ey * dvy + ez*dvz);
+            Vector n = {ex, ey, ez};
 
-            double elastic_force = force_constant * sqrt_xi * xi;
-            double dissipative_force = force_constant * damping_constant * xidot * sqrt_xi / 2;
-            double fn = elastic_force + dissipative_force;
-
-
-            if (fn > 0) {
-                p.add_force(Vector(ex * fn, ey * fn, ez * fn));
+            Vector v1 = p.rtd1;
+            Vector v2 = {0, 0, basePlate.vz()};
+            Vector omega1 = p.rot1;
+            Vector omega2 = {0, 0, 0};
+            Vector vrel = v1 - v2 - vecprod3d(r1*omega1, n);
+            Vector vtrel = vrel - scalprod3d(vrel, n)*n;
+            double vtrel_size = norm3d(vtrel);
+            Vector t;
+            if (vtrel_size > 0){
+                t = vtrel * (1/vtrel_size);
             }
+            else{
+                t = {0, 0, 0};
+            }
+
+            double xidot = -(ex * dvx + ey * dvy + ez*dvz);
+            double gamma = 0.1;
+
+            // Normal forces
+            double elastic_force = force_constant * xi * sqrt_xi;
+            double dissipative_force = force_constant * p._damping_constant * sqrt_xi * xidot;
+            double fn = elastic_force + dissipative_force;
+            if (fn < 0) fn = 0;
+
+            // Tangential forces
+            double mu = 0.5;
+            double ft = -gamma * xidot;
+            if (ft < -mu*fn) ft = -mu*fn;
+            if (ft > mu*fn) ft = mu*fn;
+
+            // Total force
+            Vector force = fn*n + ft*t;
+            Vector torque = vecprod3d(force, n);
+            p.add_force(force);
+            p.add_torque(torque);
+
+
+//            double force_constant = 4*sqrt(p.r())/3*(1/((1-p._poisson*p._poisson)/p._youngs_modulus + (1-b._poisson*b._poisson)/b._youngs_modulus));
+//            double damping_constant = (p._damping_constant + b._damping_constant)/2;
+//
+//            double sqrt_xi = sqrt(xi);
+//            double rr_rez = 1 / rr;
+//
+//            // Unit vectors
+//            double ex = dx * rr_rez;
+//            double ey = dy * rr_rez;
+//            double ez = dz * rr_rez;
+//
+//            // Relative velocities
+//            double dvx = p.vx();
+//            double dvy = p.vy();
+//            double dvz = p.vz() - basePlate.vz();
+//
+//            // Overlap rate
+//            double xidot = -(ex * dvx + ey * dvy + ez*dvz);
+//
+//            double elastic_force = force_constant * sqrt_xi * xi;
+//            double dissipative_force = force_constant * damping_constant * xidot * sqrt_xi / 2;
+//            double fn = elastic_force + dissipative_force;
+//
+//
+//            if (fn > 0) {
+//                p.add_force(Vector(ex * fn, ey * fn, ez * fn));
+//            }
         }
     }
 }
