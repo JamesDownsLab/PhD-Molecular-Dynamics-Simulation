@@ -6,9 +6,11 @@
 #define INC_3DMOLECULARDYNAMICS_PARTICLE_H
 
 #include <iostream>
-#include "Vector.h"
 #include "BasePlate.h"
 #include "Options.h"
+#include <Eigen/Dense>
+
+const Eigen::Vector3d null_vec{0, 0, 0};
 
 inline double normalize(double dx, double L) {
     while (dx < -L / 2) dx += L;
@@ -54,30 +56,30 @@ public:
     double vy() const { return rtd1.y(); }
     double& vz() { return rtd1.z(); }
     double vz() const { return rtd1.z(); }
-    Vector& force() {return _force;}
-    Vector force() const {return _force;}
+    Eigen::Vector3d & force() {return _force;}
+    Eigen::Vector3d force() const {return _force;}
 
     ///////////////////////////////////////
     /// Setters
     ///////////////////////////////////////
-    void add_force(const Vector& f) {_force += f;}
-    void add_torque(const Vector & t) {_torque += t;}
+    void add_force(const Eigen::Vector3d& f) {_force += f;}
+    void add_torque(const Eigen::Vector3d & t) {_torque += t;}
     void periodic_bc(double x_0, double y_0, double lx, double ly);
     void set_force_to_zero() { _force = null_vec;}
     void set_torque_to_zero() {_torque = null_vec;}
-    void set_z(double z) {rtd0 += Vector(0, 0, z);}
+    void set_z(double z) {rtd0 += Eigen::Vector3d(0, 0, z);}
 
     ///////////////////////////////////////
     /// Integration
     ////////////////////////////////////
     void predict(double dt);
-    void correct(double dt, Vector G);
+    void correct(double dt, Eigen::Vector3d G);
 
 private:
-    Vector rtd0{null_vec}, rtd1{null_vec}, rtd2{null_vec}, rtd3{null_vec}, rtd4{null_vec};
-    Vector rot0{null_vec}, rot1{null_vec}, rot2{null_vec}, rot3{null_vec}, rot4{null_vec};
-    Vector _force{null_vec};
-    Vector _torque{null_vec};
+    Eigen::Vector3d rtd0{null_vec}, rtd1{null_vec}, rtd2{null_vec}, rtd3{null_vec}, rtd4{null_vec};
+    Eigen::Vector3d rot0{null_vec}, rot1{null_vec}, rot2{null_vec}, rot3{null_vec}, rot4{null_vec};
+    Eigen::Vector3d _force{null_vec};
+    Eigen::Vector3d _torque{null_vec};
     double _r;
     double _m;
     double _youngs_modulus;

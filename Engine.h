@@ -17,6 +17,7 @@
 #include "Options.h"
 #include "nanoflann.h"
 #include "KDTreeVectorOfVectorsAdaptor.h"
+#include <Eigen/Dense>
 
 typedef  std::vector<std::vector<double>> my_vector_of_vectors_t;
 typedef KDTreeVectorOfVectorsAdaptor<my_vector_of_vectors_t, double> my_kd_tree_t;
@@ -127,7 +128,7 @@ private:
     double timestep{0};
 
     double Time{0};
-    Vector G{0, 0, -9.81};
+    Eigen::Vector3d G{0, 0, -9.81};
     BasePlate basePlate{0, 0, 0};
     double lx;
     double ly;

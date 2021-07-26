@@ -3,8 +3,8 @@
 //
 
 #include "Particle.h"
-#include "Vector.h"
 #include <cmath>
+
 
 
 void force(Particle &p1, Particle &p2, double lx, double ly, double lz) {
@@ -39,15 +39,15 @@ void force(Particle &p1, Particle &p2, double lx, double ly, double lz) {
             double dvy = p1.vy() - p2.vy();
             double dvz = p1.vz() - p2.vz();
 
-            Vector n = {ex, ey, ez};
+            Eigen::Vector3d n = {ex, ey, ez};
 
-            Vector v1 = p1.rtd1;
-            Vector v2 = p2.rtd1;
-            Vector omega1 = p1.rot1;
-            Vector omega2 = p2.rot2;
-            Vector vrel = v1 - v2 - vecprod3d(r1*omega1 + r2*omega2, n);
-            Vector vtrel = vrel - scalprod3d(vrel, n)*n;
-            Vector t = vtrel * (1/norm3d(vtrel));
+            Eigen::Vector3d v1 = p1.rtd1;
+            Eigen::Vector3d v2 = p2.rtd1;
+            Eigen::Vector3d omega1 = p1.rot1;
+            Eigen::Vector3d omega2 = p2.rot2;
+            Eigen::Vector3d vrel = v1 - v2 - (r1*omega1 + r2*omega2).cross(n);
+            Eigen::Vector3d vtrel = vrel - vrel.dot(n)*n;
+            Eigen::Vector3d t = vtrel * (1/vtrel.norm());
 
             double xidot = -(ex * dvx + ey * dvy + ez*dvz);
 
@@ -66,9 +66,9 @@ void force(Particle &p1, Particle &p2, double lx, double ly, double lz) {
             if (ft>mu*fn) ft = mu*fn;
 
             // Total force
-            Vector force = fn*n + ft*t;
+            Eigen::Vector3d force = fn*n + ft*t;
 
-            Vector torque = vecprod3d(force, n);
+            Eigen::Vector3d torque = force.cross(n);
 
             p1.add_force(force);
             p2.add_force(-1*force);
@@ -118,16 +118,16 @@ void force(Particle &p, Particle &b, BasePlate &basePlate) {
             double dvy = p.vy();
             double dvz = p.vz() - basePlate.vz();
 
-            Vector n = {ex, ey, ez};
+            Eigen::Vector3d n = {ex, ey, ez};
 
-            Vector v1 = p.rtd1;
-            Vector v2 = {0, 0, basePlate.vz()};
-            Vector omega1 = p.rot1;
-            Vector omega2 = {0, 0, 0};
-            Vector vrel = v1 - v2 - vecprod3d(r1*omega1, n);
-            Vector vtrel = vrel - scalprod3d(vrel, n)*n;
-            double vtrel_size = norm3d(vtrel);
-            Vector t;
+            Eigen::Vector3d v1 = p.rtd1;
+            Eigen::Vector3d v2 = {0, 0, basePlate.vz()};
+            Eigen::Vector3d omega1 = p.rot1;
+            Eigen::Vector3d omega2 = {0, 0, 0};
+            Eigen::Vector3d vrel = v1 - v2 -  (r1*omega1).cross(n);
+            Eigen::Vector3d vtrel = vrel - vrel.dot(n)*n;
+            double vtrel_size = vtrel.norm();
+            Eigen::Vector3d t;
             if (vtrel_size > 0){
                 t = vtrel * (1/vtrel_size);
             }
@@ -151,8 +151,8 @@ void force(Particle &p, Particle &b, BasePlate &basePlate) {
             if (ft > mu*fn) ft = mu*fn;
 
             // Total force
-            Vector force = fn*n + ft*t;
-            Vector torque = vecprod3d(force, n);
+            Eigen::Vector3d force = fn*n + ft*t;
+            Eigen::Vector3d torque = force.cross(n);
             p.add_force(force);
             p.add_torque(torque);
         }
@@ -176,9 +176,9 @@ void Particle::predict(double dt) {
     rot3 += a1*rot4;
 }
 
-void Particle::correct(double dt, Vector G) {
+void Particle::correct(double dt, Eigen::Vector3d G) {
 
-    static Vector accel, corr, rot_accel, rot_corr;
+    static Eigen::Vector3d accel, corr, rot_accel, rot_corr;
 
     double dtrez = 1/dt;
     const double coeff0 = double(19)/double(90) * (dt*dt/double(2));
@@ -186,7 +186,7 @@ void Particle::correct(double dt, Vector G) {
     const double coeff3 = double(1)/double(2)*(double(3)*dtrez);
     const double coeff4 = double(1)/double(12)*(double(12)*(dtrez*dtrez));
 
-    accel = Vector((1/_m)*_force.x()+G.x(), (1/_m)*_force.y()+G.y(), (1/_m)*_force.z()+G.z());
+    accel = Eigen::Vector3d((1/_m)*_force.x()+G.x(), (1/_m)*_force.y()+G.y(), (1/_m)*_force.z()+G.z());
     corr = accel - rtd2;
     rtd0 += coeff0*corr;
     rtd1 += coeff1*corr;
