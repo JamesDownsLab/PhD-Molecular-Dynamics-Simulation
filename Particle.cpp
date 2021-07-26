@@ -155,35 +155,6 @@ void force(Particle &p, Particle &b, BasePlate &basePlate) {
             Vector torque = vecprod3d(force, n);
             p.add_force(force);
             p.add_torque(torque);
-
-
-//            double force_constant = 4*sqrt(p.r())/3*(1/((1-p._poisson*p._poisson)/p._youngs_modulus + (1-b._poisson*b._poisson)/b._youngs_modulus));
-//            double damping_constant = (p._damping_constant + b._damping_constant)/2;
-//
-//            double sqrt_xi = sqrt(xi);
-//            double rr_rez = 1 / rr;
-//
-//            // Unit vectors
-//            double ex = dx * rr_rez;
-//            double ey = dy * rr_rez;
-//            double ez = dz * rr_rez;
-//
-//            // Relative velocities
-//            double dvx = p.vx();
-//            double dvy = p.vy();
-//            double dvz = p.vz() - basePlate.vz();
-//
-//            // Overlap rate
-//            double xidot = -(ex * dvx + ey * dvy + ez*dvz);
-//
-//            double elastic_force = force_constant * sqrt_xi * xi;
-//            double dissipative_force = force_constant * damping_constant * xidot * sqrt_xi / 2;
-//            double fn = elastic_force + dissipative_force;
-//
-//
-//            if (fn > 0) {
-//                p.add_force(Vector(ex * fn, ey * fn, ez * fn));
-//            }
         }
     }
 }
