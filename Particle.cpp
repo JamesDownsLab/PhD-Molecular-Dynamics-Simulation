@@ -163,17 +163,14 @@ void Particle::predict(double dt) {
     double a1 = dt;
     double a2 = a1*dt/2;
     double a3 = a2*dt/3;
-    double a4 = a3*dt/4;
 
-    rtd0 += a1*rtd1 + a2*rtd2 + a3*rtd3 + a4*rtd4;
-    rtd1 += a1*rtd2 + a2*rtd3 + a3*rtd4;
-    rtd2 += a1*rtd3 + a2*rtd4;
-    rtd3 += a1*rtd4;
+    rtd0 += a1*rtd1 + a2*rtd2 + a3*rtd3;
+    rtd1 += a1*rtd2 + a2*rtd3;
+    rtd2 += a1*rtd3;
 
-    rot0 += a1*rot1 + a2*rot2 + a3*rot3 + a4*rot4;
-    rot1 += a1*rot2 + a2*rot3 + a3*rot4;
-    rot2 += a1*rot3 + a2*rot4;
-    rot3 += a1*rot4;
+    rot0 += a1*rot1 + a2*rot2 + a3*rot3;
+    rot1 += a1*rot2 + a2*rot3;
+    rot2 += a1*rot3;
 }
 
 void Particle::correct(double dt, Eigen::Vector3d G) {
@@ -181,10 +178,9 @@ void Particle::correct(double dt, Eigen::Vector3d G) {
     static Eigen::Vector3d accel, corr, rot_accel, rot_corr;
 
     double dtrez = 1/dt;
-    const double coeff0 = double(19)/double(90) * (dt*dt/double(2));
-    const double coeff1 = double(3)/double(4)*(dt/double(2));
-    const double coeff3 = double(1)/double(2)*(double(3)*dtrez);
-    const double coeff4 = double(1)/double(12)*(double(12)*(dtrez*dtrez));
+    const double coeff0 = double(1)/double(6) * (dt*dt/double(2));
+    const double coeff1 = double(5)/double(6)*(dt/double(2));
+    const double coeff3 = double(1)/double(3)*(double(3)*dtrez);
 
     accel = Eigen::Vector3d((1/_m)*_force.x()+G.x(), (1/_m)*_force.y()+G.y(), (1/_m)*_force.z()+G.z());
     corr = accel - rtd2;
@@ -192,7 +188,6 @@ void Particle::correct(double dt, Eigen::Vector3d G) {
     rtd1 += coeff1*corr;
     rtd2 = accel;
     rtd3 += coeff3*corr;
-    rtd4 += coeff4*corr;
 
     rot_accel = _torque * (1/J);
     rot_corr = rot_accel - rot2;
@@ -200,5 +195,4 @@ void Particle::correct(double dt, Eigen::Vector3d G) {
     rot1 += coeff1*rot_corr;
     rot2 = rot_accel;
     rot3 += coeff3*rot_corr;
-    rot4 += coeff4*rot_corr;
 }

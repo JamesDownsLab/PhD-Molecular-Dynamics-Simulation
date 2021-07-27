@@ -76,8 +76,8 @@ public:
     void correct(double dt, Eigen::Vector3d G);
 
 private:
-    Eigen::Vector3d rtd0{null_vec}, rtd1{null_vec}, rtd2{null_vec}, rtd3{null_vec}, rtd4{null_vec};
-    Eigen::Vector3d rot0{null_vec}, rot1{null_vec}, rot2{null_vec}, rot3{null_vec}, rot4{null_vec};
+    Eigen::Vector3d rtd0{null_vec}, rtd1{null_vec}, rtd2{null_vec}, rtd3{null_vec};
+    Eigen::Vector3d rot0{null_vec}, rot1{null_vec}, rot2{null_vec}, rot3{null_vec};
     Eigen::Vector3d _force{null_vec};
     Eigen::Vector3d _torque{null_vec};
     double _r;
