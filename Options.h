@@ -36,6 +36,8 @@ struct ParticleProps {
     double youngs_modulus;
     double poisson;
     double damping_factor; // A in Poschel's book
+    double friction;
+    double tangential_damping;
 
 };
 

@@ -91,6 +91,18 @@ Options read_input_file(const char* fname){
         else if (type == "#base_damping:"){
             stream >> baseProps.damping_factor;
         }
+        else if (type == "#ball_friction:"){
+            stream >> ballProps.friction;
+        }
+        else if (type == "#ball_tangential_damping:"){
+            stream >> ballProps.tangential_damping;
+        }
+        else if (type == "#base_friction:"){
+            stream >> baseProps.friction;
+        }
+        else if (type == "#base_tangential_damping:"){
+            stream >> baseProps.tangential_damping;
+        }
         else {
             std::cout << "Unknown type: " << type << std::endl;
         }

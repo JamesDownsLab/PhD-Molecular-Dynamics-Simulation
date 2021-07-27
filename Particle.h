@@ -30,7 +30,7 @@ public:
     Particle(double x, double y, double z, ParticleProps props) :
         rtd0(x, y, z), rtd1(null_vec), rtd2(null_vec), _r(props.radius),
         _m(props.mass), _youngs_modulus(props.youngs_modulus), _poisson(props.poisson),
-        _damping_constant(props.damping_factor){J = 0.4*_m*_r*_r;}
+        _damping_constant(props.damping_factor), _friction(props.friction), _tangential_damping(props.tangential_damping){J = 0.4*_m*_r*_r;}
     Particle(const Particle& rhs) = default;
     Particle(Particle && rhs) = default;
     Particle& operator=(const Particle & rhs) = default;
@@ -86,5 +86,7 @@ private:
     double _poisson;
     double _damping_constant;
     double J{0};
+    double _friction; // Coefficient of friction
+    double _tangential_damping;
 };
 #endif //INC_3DMOLECULARDYNAMICS_PARTICLE_H

@@ -51,7 +51,7 @@ void force(Particle &p1, Particle &p2, double lx, double ly, double lz) {
 
             double xidot = -(ex * dvx + ey * dvy + ez*dvz);
 
-            double gamma = 0.1;
+            double gamma = p1._tangential_damping;
 
             // Normal Forces
             double elastic_force = force_constant * xi * sqrt_xi;
@@ -60,7 +60,7 @@ void force(Particle &p1, Particle &p2, double lx, double ly, double lz) {
             if (fn < 0) fn = 0;
 
             // Tangential forces
-            double mu = 0.5;
+            double mu = p1._friction;
             double ft = -gamma * xidot;
             if (ft < -mu*fn) ft = -mu*fn;
             if (ft>mu*fn) ft = mu*fn;
@@ -136,16 +136,16 @@ void force(Particle &p, Particle &b, BasePlate &basePlate) {
             }
 
             double xidot = -(ex * dvx + ey * dvy + ez*dvz);
-            double gamma = 0.1;
+            double gamma = 0.5*(p._tangential_damping+b._tangential_damping);
 
             // Normal forces
             double elastic_force = force_constant * xi * sqrt_xi;
-            double dissipative_force = force_constant * p._damping_constant * sqrt_xi * xidot;
+            double dissipative_force = force_constant * A * sqrt_xi * xidot;
             double fn = elastic_force + dissipative_force;
             if (fn < 0) fn = 0;
 
             // Tangential forces
-            double mu = 0.5;
+            double mu = p._friction;
             double ft = -gamma * xidot;
             if (ft < -mu*fn) ft = -mu*fn;
             if (ft > mu*fn) ft = mu*fn;
