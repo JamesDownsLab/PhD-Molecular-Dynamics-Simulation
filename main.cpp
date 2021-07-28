@@ -36,6 +36,23 @@ int main(int argc, char** argv){
         }
     }
 
+    else if (options.programOptions.experiment == "ramp"){
+        std::cout << "Stating ramp experiment" << std::endl;
+        engine.set_baseplate(options.programOptions.amplitude_start, 0.02);
+        double start = options.programOptions.amplitude_start;
+        double amp = start;
+        double end = options.programOptions.amplitude_end;
+        double rate = options.programOptions.ramp_rate;
+        double time = std::abs((start - end)/rate);
+        double steps = round(time / options.programOptions.timestep);
+        double interval = (end - start)/steps;
+        for (int s{0}; s<=steps; s++){
+            amp += interval;
+            engine.set_baseplate(amp, 0.02);
+            engine.step();
+        }
+    }
+
     else {
         std::cout << "Experiment not specified" << std::endl;
     }

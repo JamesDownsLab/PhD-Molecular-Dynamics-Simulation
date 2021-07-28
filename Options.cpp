@@ -109,6 +109,15 @@ Options read_input_file(const char* fname){
         else if (type == "#savepath_base:"){
             stream >> programOptions.savepathbase;
         }
+        else if (type == "#amplitude_start:"){
+            stream >> programOptions.amplitude_start;
+        }
+        else if (type == "#amplitude_end:"){
+            stream >> programOptions.amplitude_end;
+        }
+        else if (type == "#ramp_rate:"){
+            stream >> programOptions.ramp_rate;
+        }
         else {
             std::cout << "Unknown type: " << type << std::endl;
         }

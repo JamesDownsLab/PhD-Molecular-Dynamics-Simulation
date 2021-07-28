@@ -17,6 +17,9 @@ struct ProgramOptions {
     double timestep{0};
     std::string experiment{""};
     double amplitude;
+    double amplitude_start;
+    double amplitude_end;
+    double ramp_rate;
     bool dump_separate;
 };
 
