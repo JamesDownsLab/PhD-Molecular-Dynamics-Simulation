@@ -17,6 +17,7 @@ Engine::Engine(Options& options)
     init_system();
 
     basePlate.set_zi(_options.systemProps.base_height);
+    basePlate.update(0.0);
     dump(true);
 }
 
@@ -213,10 +214,10 @@ void Engine::make_forces() {
 
 void Engine::make_plate_forces() {
     for (auto& p: particles){
-        double z = p.z();
-        double r1 = _options.baseProps.radius;
-        double r2 = _options.ballProps.radius;
-        if (z-basePlate.z() < r1+r2) {
+//        double z = p.z();
+//        double r1 = _options.baseProps.radius;
+//        double r2 = _options.ballProps.radius;
+//        if (z-basePlate.z() < 2*(r1+r2)) {
             double x = p.x();
             double y = p.y();
             int ix = int(x / gk_base);
@@ -226,12 +227,12 @@ void Engine::make_plate_forces() {
                     int iix = (ix + dx + nx_base) % (nx_base);
                     int iiy = (iy + dy + ny_base) % (ny_base);
                     int k = pindex_base[iix][iiy];
-                    if (k>0) {
+                    if (k>=0) {
                         force(p, base_particles.at(k), basePlate);
                     }
                 }
             }
-        }
+//        }
     }
 }
 
@@ -341,8 +342,8 @@ void Engine::create_dimples() {
 
     int nx = floor(lx / dx);
     int ny = floor(ly / dy);
-    for (int i{0}; i < nx; i++) {
-        for (int j{0}; j < ny; j++) {
+    for (int i{0}; i <= nx; i++) {
+        for (int j{0}; j <= ny; j++) {
             double x = double(i) * dx + double(j % 2) * dx / 2.0;
             double y = double(j) * dy;
             const double query_pt[2] = {x, y};
