@@ -11,11 +11,13 @@
 
 struct ProgramOptions {
     std::filesystem::path savepath{""};
+    std::filesystem::path savepathbase{""};
     int steps{0};
     int save_interval{0};
     double timestep{0};
     std::string experiment{""};
     double amplitude;
+    bool dump_separate;
 };
 
 struct SystemProps {

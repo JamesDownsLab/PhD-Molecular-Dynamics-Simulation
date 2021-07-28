@@ -30,6 +30,7 @@ int main(int argc, char** argv){
         for (int s{0}; s <= options.programOptions.steps/2; s++) {
             engine.step();
         }
+        engine.set_baseplate(0.0, 0.02);
         for (int s{0}; s<=options.programOptions.steps/2; s++){
             engine.step();
         }

@@ -103,10 +103,14 @@ private:
     /// File saving
     //////////////////////////////////////////////////////////
 
-    void dump();
+    void dump(bool first);
+    void dump_preamble(std::FILE* f, bool inc_particles, bool inc_base_particles) const;
+    void dump_particles(std::FILE* f);
+    void dump_base(std::FILE * f);
     void check_dump();
     int save{1};
     std::FILE* f1;
+    std::FILE* f2;
 
     ///////////////////////////////////////////////////////////
     /// Particle data

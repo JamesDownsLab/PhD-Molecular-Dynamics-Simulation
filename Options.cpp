@@ -103,6 +103,12 @@ Options read_input_file(const char* fname){
         else if (type == "#base_tangential_damping:"){
             stream >> baseProps.tangential_damping;
         }
+        else if (type == "#dump_separate:"){
+            stream >> programOptions.dump_separate;
+        }
+        else if (type == "#savepath_base:"){
+            stream >> programOptions.savepathbase;
+        }
         else {
             std::cout << "Unknown type: " << type << std::endl;
         }

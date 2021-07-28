@@ -11,10 +11,13 @@ Engine::Engine(Options& options)
     begin = std::chrono::steady_clock::now();
     timestep = options.programOptions.timestep;
     f1 = fopen(_options.programOptions.savepath.string().c_str(), "w");
+    if (_options.programOptions.dump_separate){
+        f2 = fopen(_options.programOptions.savepathbase.string().c_str(), "w");
+    }
     init_system();
 
     basePlate.set_zi(_options.systemProps.base_height);
-    dump();
+    dump(true);
 }
 
 void Engine::init_system() {
@@ -26,22 +29,47 @@ void Engine::init_system() {
     init_lattice_algorithm_for_base_particles();
 }
 
-void Engine::dump() {
+void Engine::dump(bool first) {
     std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
     std::cout << "DUMP Simulation Time : " << Time << " s\t"
         << "Timestep : " << Time/timestep << "\t"
         << "Elapsed time: " << std::chrono::duration_cast<std::chrono::seconds>(now-begin).count() << "s" << std::endl;
 
-    std::fprintf(f1, "ITEM: TIMESTEP\n%d\n", int(Time / timestep));
-    std::fprintf(f1, "ITEM: TIME\n%.8f\n", Time);
-    std::fprintf(f1, "ITEM: BOX BOUNDS pp pp f\n%.4f %.4f\n%.4f %.4f\n%.4f %.4f\n", 0.0, lx, 0.0, ly, 0.0, lz);
-    std::fprintf(f1, "ITEM: NUMBER OF ATOMS\n%d\n", int(no_of_particles)+int(no_of_base_particles));
-    std::fprintf(f1, "ITEM: ATOMS x y z vx vy vz radius type\n");
-    for (Particle& p : particles) {
-        std::fprintf(f1, "%.9f %.9f %.9f %.9f %.9f %.9f %.9f %d\n", p.x(), p.y(), p.z(), p.vx(), p.vy(), p.vz(), p.r(), 0);
+    dump_preamble(f1, true, !_options.programOptions.dump_separate);
+    dump_particles(f1);
+    if (!_options.programOptions.dump_separate){
+        dump_base(f1);
     }
-    for (Particle& p: base_particles) {
-        std::fprintf(f1, "%.9f %.9f %.9f %.9f %.9f %.9f %.9f %d\n", p.x(), p.y(), p.z() + basePlate.z(), p.vx(), p.vy(), basePlate.vz(), p.r(), 1);
+
+    if (first){
+        if (_options.programOptions.dump_separate){
+            dump_preamble(f2, false, true);
+            dump_base(f2);
+        }
+    }
+}
+
+void Engine::dump_preamble(std::FILE *f, bool inc_particles, bool inc_base_particles) const {
+    int N = 0;
+    if (inc_particles) N += no_of_particles;
+    if (inc_base_particles) N += no_of_base_particles;
+    std::fprintf(f, "ITEM: TIMESTEP\n%d\n", int(Time / timestep));
+    std::fprintf(f, "ITEM: TIME\n%.8f\n", Time);
+    std::fprintf(f, "ITEM: BOX BOUNDS pp pp f\n%.4f %.4f\n%.4f %.4f\n%.4f %.4f\n", 0.0, lx, 0.0, ly, 0.0, lz);
+    std::fprintf(f, "ITEM: NUMBER OF ATOMS\n%d\n", N);
+    std::fprintf(f, "ITEM: ATOMS x y z vx vy vz radius type\n");
+}
+
+void Engine::dump_particles(std::FILE *f) {
+    for (Particle& p : particles) {
+        std::fprintf(f, "%.9f %.9f %.9f %.9f %.9f %.9f %.9f %d\n", p.x(), p.y(), p.z(), p.vx(), p.vy(), p.vz(), p.r(), 0);
+    }
+}
+
+void Engine::dump_base(std::FILE *f) {
+    for (Particle &p: base_particles) {
+        std::fprintf(f, "%.9f %.9f %.9f %.9f %.9f %.9f %.9f %d\n", p.x(), p.y(), p.z() + basePlate.z(), p.vx(),
+                     p.vy(), basePlate.vz(), p.r(), 1);
     }
 }
 
@@ -213,7 +241,7 @@ void Engine::check_dump() {
     }
     else {
         save = 1;
-        dump();
+        dump(false);
     }
 }
 
