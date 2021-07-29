@@ -205,19 +205,18 @@ void Engine::clear_pindex()
 void Engine::make_forces() {
     // Loop over the partners list for each particle
     for (unsigned int i{ 0 }; i < no_of_particles; i++) {
+        std::set<size_t> contacts;
         for (unsigned int k{ 0 }; k < partners[i].size(); k++) {
             int pk = partners[i][k];
-            force(particles[i], particles[pk], _options.systemProps.lx, _options.systemProps.ly, _options.systemProps.lz);
+            bool contact = force(particles[i], particles[pk], _options.systemProps.lx, _options.systemProps.ly, _options.systemProps.lz, timestep);
+            if (contact) contacts.insert(pk);
         }
+        particles[i].update_particle_contacts(contacts);
     }
 }
 
 void Engine::make_plate_forces() {
     for (auto& p: particles){
-//        double z = p.z();
-//        double r1 = _options.baseProps.radius;
-//        double r2 = _options.ballProps.radius;
-//        if (z-basePlate.z() < 2*(r1+r2)) {
             std::set<size_t> contacts;
             double x = p.x();
             double y = p.y();
@@ -235,7 +234,6 @@ void Engine::make_plate_forces() {
                 }
             }
             p.update_base_contacts(contacts);
-//        }
     }
 }
 

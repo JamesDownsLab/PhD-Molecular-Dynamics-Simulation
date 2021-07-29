@@ -7,7 +7,7 @@
 
 
 
-void force(Particle &p1, Particle &p2, double lx, double ly, double lz) {
+bool force(Particle &p1, Particle &p2, double lx, double ly, double lz, double timestep) {
     double dx = normalize(p1.x() - p2.x(), lx);
     double dy = normalize(p1.y() - p2.y(), ly);
     double dz = normalize(p1.z() - p2.z(), lz);
@@ -47,7 +47,23 @@ void force(Particle &p1, Particle &p2, double lx, double ly, double lz) {
             Eigen::Vector3d omega2 = p2.rot2;
             Eigen::Vector3d vrel = v1 - v2 - (r1*omega1 + r2*omega2).cross(n);
             Eigen::Vector3d vtrel = vrel - vrel.dot(n)*n;
-            Eigen::Vector3d t = vtrel * (1/vtrel.norm());
+            double vtrel_size = vtrel.norm();
+            Eigen::Vector3d t;
+            if (vtrel_size > 0){
+                t = vtrel * (1/vtrel_size);
+            }
+            else{
+                t = {0, 0, 0};
+            }
+
+            // Update the contacts
+            if (p1.particle_contacts.find(p2.index) == p1.particle_contacts.end()){
+                // No contact
+                p1.particle_contacts[p2.index] = vtrel*timestep;
+            }
+            else {
+                p1.particle_contacts[p2.index] += vtrel*timestep;
+            }
 
             double xidot = -(ex * dvx + ey * dvy + ez*dvz);
 
@@ -61,7 +77,8 @@ void force(Particle &p1, Particle &p2, double lx, double ly, double lz) {
 
             // Tangential forces
             double mu = p1._friction;
-            double ft = -gamma * xidot;
+            double elongation = p1.particle_contacts[p2.index].norm();
+            double ft = -gamma * elongation;
             if (ft < -mu*fn) ft = -mu*fn;
             if (ft>mu*fn) ft = mu*fn;
 
@@ -75,8 +92,10 @@ void force(Particle &p1, Particle &p2, double lx, double ly, double lz) {
 
             p1.add_torque(torque);
             p2.add_torque(-1*torque);
-
-
+            return true;
+        }
+        else{
+            return false;
         }
     }
 }
@@ -225,5 +244,17 @@ void Particle::update_base_contacts(std::set<size_t>& contacts){
     }
     for (size_t k: to_delete){
         base_contacts.erase(k);
+    }
+}
+
+void Particle::update_particle_contacts(std::set<size_t>& contacts){
+    std::set<size_t> to_delete;
+    for (const auto& [key, value] : particle_contacts){
+        if (!contacts.contains(key)){
+            to_delete.insert(key);
+        }
+    }
+    for (size_t k: to_delete){
+        particle_contacts.erase(k);
     }
 }

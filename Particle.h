@@ -24,7 +24,7 @@ class Particle {
     //////////////////////
     /// Force calculation
     //////////////////////
-    friend void force(Particle& p1, Particle& p2, double lx, double ly, double lz);
+    friend bool force(Particle& p1, Particle& p2, double lx, double ly, double lz, double timestep);
     friend bool force(Particle& p, Particle& b, BasePlate& basePlate, double timestep);
 
 
@@ -78,6 +78,7 @@ public:
     void correct(double dt, Eigen::Vector3d G);
 
     void update_base_contacts(std::set<size_t>& contacts);
+    void update_particle_contacts(std::set<size_t>& contacts);
 
 private:
     Eigen::Vector3d rtd0{null_vec}, rtd1{null_vec}, rtd2{null_vec}, rtd3{null_vec};
@@ -96,6 +97,8 @@ private:
 
     // Keep track of contacts with base particles
     std::map<size_t, Eigen::Vector3d> base_contacts; // <particle index, spring elongation>
+
+    std::map<size_t, Eigen::Vector3d> particle_contacts;
 
 };
 #endif //INC_3DMOLECULARDYNAMICS_PARTICLE_H
