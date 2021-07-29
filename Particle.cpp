@@ -89,7 +89,7 @@ void Particle::periodic_bc(double x_0, double y_0, double lx, double ly) {
     while (rtd0.y() > y_0 + ly) rtd0.y() -= ly;
 }
 
-void force(Particle &p, Particle &b, BasePlate &basePlate) {
+bool force(Particle &p, Particle &b, BasePlate &basePlate, double timestep) {
     double dx = p.x() - b.x();
     double dy = p.y() - b.y();
     double dz = p.z() - (basePlate.z()+b.z());
@@ -101,6 +101,9 @@ void force(Particle &p, Particle &b, BasePlate &basePlate) {
         // Overlap
         double xi = r1 + r2 - rr;
         if (xi > 1e-10) {
+
+
+
             double Y = (p._youngs_modulus*b._youngs_modulus)/(p._youngs_modulus+b._youngs_modulus);
             double poisson = 0.5*(p._poisson+b._poisson);
             double A = 0.5*(p._damping_constant + b._damping_constant);
@@ -126,6 +129,17 @@ void force(Particle &p, Particle &b, BasePlate &basePlate) {
             Eigen::Vector3d omega2 = {0, 0, 0};
             Eigen::Vector3d vrel = v1 - v2 -  (r1*omega1).cross(n);
             Eigen::Vector3d vtrel = vrel - vrel.dot(n)*n;
+
+            // Update the contacts
+            if (p.base_contacts.find(b.index) == p.base_contacts.end()){
+                // No contact
+                p.base_contacts[b.index] = vtrel*timestep;
+            }
+            else {
+                p.base_contacts[b.index] += vtrel*timestep;
+            }
+
+
             double vtrel_size = vtrel.norm();
             Eigen::Vector3d t;
             if (vtrel_size > 0){
@@ -146,7 +160,8 @@ void force(Particle &p, Particle &b, BasePlate &basePlate) {
 
             // Tangential forces
             double mu = p._friction;
-            double ft = -gamma * xidot;
+            double elongation = p.base_contacts[b.index].norm();
+            double ft = -gamma * elongation;
             if (ft < -mu*fn) ft = -mu*fn;
             if (ft > mu*fn) ft = mu*fn;
 
@@ -155,6 +170,10 @@ void force(Particle &p, Particle &b, BasePlate &basePlate) {
             Eigen::Vector3d torque = force.cross(n);
             p.add_force(force);
             p.add_torque(torque);
+            return true;
+        }
+        else{
+            return false;
         }
     }
 }
@@ -195,4 +214,16 @@ void Particle::correct(double dt, Eigen::Vector3d G) {
     rot1 += coeff1*rot_corr;
     rot2 = rot_accel;
     rot3 += coeff3*rot_corr;
+}
+
+void Particle::update_base_contacts(std::set<size_t>& contacts){
+    std::set<size_t> to_delete;
+    for (const auto& [key, value] : base_contacts){
+        if (!contacts.contains(key)){
+            to_delete.insert(key);
+        }
+    }
+    for (size_t k: to_delete){
+        base_contacts.erase(k);
+    }
 }

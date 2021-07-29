@@ -9,6 +9,8 @@
 #include "BasePlate.h"
 #include "Options.h"
 #include <Eigen/Dense>
+#include <map>
+#include <set>
 
 const Eigen::Vector3d null_vec{0, 0, 0};
 
@@ -23,12 +25,12 @@ class Particle {
     /// Force calculation
     //////////////////////
     friend void force(Particle& p1, Particle& p2, double lx, double ly, double lz);
-    friend void force(Particle& p, Particle& b, BasePlate& basePlate);
+    friend bool force(Particle& p, Particle& b, BasePlate& basePlate, double timestep);
 
 
 public:
-    Particle(double x, double y, double z, ParticleProps props) :
-        rtd0(x, y, z), rtd1(null_vec), rtd2(null_vec), _r(props.radius),
+    Particle(double x, double y, double z, size_t index, ParticleProps props) :
+        rtd0(x, y, z), index(index), rtd1(null_vec), rtd2(null_vec), _r(props.radius),
         _m(props.mass), _youngs_modulus(props.youngs_modulus), _poisson(props.poisson),
         _damping_constant(props.damping_factor), _friction(props.friction), _tangential_damping(props.tangential_damping){J = 0.4*_m*_r*_r;}
     Particle(const Particle& rhs) = default;
@@ -75,6 +77,8 @@ public:
     void predict(double dt);
     void correct(double dt, Eigen::Vector3d G);
 
+    void update_base_contacts(std::set<size_t>& contacts);
+
 private:
     Eigen::Vector3d rtd0{null_vec}, rtd1{null_vec}, rtd2{null_vec}, rtd3{null_vec};
     Eigen::Vector3d rot0{null_vec}, rot1{null_vec}, rot2{null_vec}, rot3{null_vec};
@@ -88,5 +92,10 @@ private:
     double J{0};
     double _friction; // Coefficient of friction
     double _tangential_damping;
+    size_t index;
+
+    // Keep track of contacts with base particles
+    std::map<size_t, Eigen::Vector3d> base_contacts; // <particle index, spring elongation>
+
 };
 #endif //INC_3DMOLECULARDYNAMICS_PARTICLE_H

@@ -218,6 +218,7 @@ void Engine::make_plate_forces() {
 //        double r1 = _options.baseProps.radius;
 //        double r2 = _options.ballProps.radius;
 //        if (z-basePlate.z() < 2*(r1+r2)) {
+            std::set<size_t> contacts;
             double x = p.x();
             double y = p.y();
             int ix = int(x / gk_base);
@@ -228,10 +229,12 @@ void Engine::make_plate_forces() {
                     int iiy = (iy + dy + ny_base) % (ny_base);
                     int k = pindex_base[iix][iiy];
                     if (k>=0) {
-                        force(p, base_particles.at(k), basePlate);
+                        bool contact = force(p, base_particles.at(k), basePlate, timestep);
+                        if (contact) contacts.insert(k);
                     }
                 }
             }
+            p.update_base_contacts(contacts);
 //        }
     }
 }
@@ -258,15 +261,17 @@ void Engine::add_particles() {
     std::default_random_engine eng(rd());
     std::uniform_real_distribution<> distr(0.0, 1.0);
 
+    size_t index = 0;
     for (int i{0}; i < nx; i++){
         for (int j{0}; j < ny; j++){
             double x = double(i)*dx + double(j%2)*dx/2.0;
             double y = double(j)*dy;
             double z = _options.systemProps.ball_height;
-            Particle pp(x, y, z, _options.ballProps);
+            Particle pp(x, y, z, index, _options.ballProps);
             double area_fraction = _options.systemProps.area_fraction;
             if (distr(eng) < area_fraction) {
                 particles.push_back(pp);
+                index++;
             }
         }
     }
@@ -280,13 +285,15 @@ void Engine::add_base_particles() {
 
     int nx = floor(lx / dx);
     int ny = floor(ly / dy);
+    size_t index = 0;
     for (int i{0}; i < nx; i++){
         for (int j{0}; j < ny; j++){
             double x = double(i)*dx + double(j%2)*dx/2.0;
             double y = double(j)*dy;
             double z = _options.systemProps.base_height;
-            Particle pp(x, y, z, _options.baseProps);
+            Particle pp(x, y, z, index, _options.baseProps);
             base_particles.push_back(pp);
+            index++;
         }
     }
     no_of_base_particles = base_particles.size();

@@ -18,6 +18,7 @@
 #include "nanoflann.h"
 #include "KDTreeVectorOfVectorsAdaptor.h"
 #include <Eigen/Dense>
+#include <set>
 
 typedef  std::vector<std::vector<double>> my_vector_of_vectors_t;
 typedef KDTreeVectorOfVectorsAdaptor<my_vector_of_vectors_t, double> my_kd_tree_t;
