@@ -24,6 +24,8 @@ public:
     double& vz() {return _vz;}
     double vz() const {return _vz;}
 
+    double& A() {return _A;}
+    double A() const {return _A;}
 
 private:
     double _z0{0};
