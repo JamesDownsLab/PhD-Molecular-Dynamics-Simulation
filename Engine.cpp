@@ -56,6 +56,7 @@ void Engine::dump_preamble(std::FILE *f, bool inc_particles, bool inc_base_parti
     if (inc_base_particles) N += no_of_base_particles;
     std::fprintf(f, "ITEM: TIMESTEP\n%d\n", int(Time / timestep));
     std::fprintf(f, "ITEM: TIME\n%.8f\n", Time);
+    std::fprintf(f, "ITEM: AMPLITUDE\n%.8f\n", basePlate.A());
     std::fprintf(f, "ITEM: BOX BOUNDS pp pp f\n%.4f %.4f\n%.4f %.4f\n%.4f %.4f\n", 0.0, lx, 0.0, ly, 0.0, lz);
     std::fprintf(f, "ITEM: NUMBER OF ATOMS\n%d\n", N);
     std::fprintf(f, "ITEM: ATOMS x y z vx vy vz radius type\n");
