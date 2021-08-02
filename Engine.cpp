@@ -346,8 +346,8 @@ void Engine::create_dimples() {
     double dx = L;
     double dy = L * sqrt(3) / 2;
 
-    int nx = floor(lx / dx);
-    int ny = floor(ly / dy);
+    int nx = ceil(lx / dx);
+    int ny = ceil(ly / dy);
     for (int i{0}; i <= nx; i++) {
         for (int j{0}; j <= ny; j++) {
             double x = double(i) * dx + double(j % 2) * dx / 2.0;
