@@ -98,6 +98,7 @@ bool force(Particle &p1, Particle &p2, double lx, double ly, double lz, double t
             return false;
         }
     }
+    return false;
 }
 
 
@@ -195,6 +196,7 @@ bool force(Particle &p, Particle &b, BasePlate &basePlate, double timestep) {
             return false;
         }
     }
+    return false;
 }
 
 void Particle::predict(double dt) {
