@@ -46,6 +46,7 @@ void Engine::dump(bool first) {
         if (_options.programOptions.dump_separate){
             dump_preamble(f2, false, true);
             dump_base(f2);
+            fclose(f2);
         }
     }
 }
