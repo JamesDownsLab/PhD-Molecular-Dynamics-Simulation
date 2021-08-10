@@ -54,6 +54,9 @@ private:
 
     void create_dimples();
 
+    /// Adjust lx and ly to match an integer number of dimples
+    void adjust_box_dimensions();
+
     /// Calculate the collisional forces between all particles
     void make_forces();
 

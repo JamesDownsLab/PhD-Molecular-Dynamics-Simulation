@@ -22,6 +22,8 @@ Engine::Engine(Options& options)
 }
 
 void Engine::init_system() {
+    adjust_box_dimensions();
+
     add_particles();
     add_base_particles();
     create_dimples();
@@ -283,8 +285,8 @@ void Engine::add_base_particles() {
     double dx = 2*r;
     double dy = 2*r*sqrt(3.0)/2.0;
 
-    int nx = floor(lx / dx);
-    int ny = floor(ly / dy);
+    int nx = ceil(lx / dx);
+    int ny = ceil(ly / dy);
     size_t index = 0;
     for (int i{0}; i < nx; i++){
         for (int j{0}; j < ny; j++){
@@ -366,4 +368,20 @@ void Engine::create_dimples() {
         }
 
     }
+}
+
+void Engine::adjust_box_dimensions() {
+    double L = _options.systemProps.dimple_spacing;
+    double dx = L;
+    double dy = L * sqrt(3) / 2;
+
+    int nx = ceil(lx / dx);
+    if (nx % 2 == 0) nx += 1;
+    std::cout << "Nx: " << nx << std::endl;
+    lx = dx * nx;
+
+    int ny = ceil(ly / dy);
+    if (ny % 2 == 1) ny += 1;
+    std::cout << "Ny: " << ny << std::endl;
+    ly = dy * ny;
 }
