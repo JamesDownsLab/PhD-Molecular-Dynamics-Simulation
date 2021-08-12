@@ -107,7 +107,6 @@ void Engine::integrate() {
     // Update  the positions of all the particles
     std::for_each(particles.begin(), particles.end(),
                   [&](Particle& p){
-//        p.velocity_verlet(timestep, G, ball_mass);
             p.correct(timestep, G);
     });
 

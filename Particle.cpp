@@ -12,7 +12,8 @@ bool force(Particle &p1, Particle &p2, double lx, double ly, double lz, double t
     double dy = normalize(p1.y() - p2.y(), ly);
     double dz = normalize(p1.z() - p2.z(), lz);
     if (std::abs(dx) < p1.r() + p2.r() && std::abs(dy) < p1.r() + p2.r() && std::abs(dz) < p1.r() + p2.r()){
-        double rr = sqrt(dx*dx + dy*dy + dz*dz);
+        Eigen::Vector3d dr = {dx, dy, dz};
+        double rr = dr.norm();
         double r1 = p1.r();
         double r2 = p2.r();
 
@@ -28,33 +29,17 @@ bool force(Particle &p1, Particle &p2, double lx, double ly, double lz, double t
             double force_constant = 2*Y*sqrt(r1)/(3*(1-poisson*poisson));
 
             double sqrt_xi = sqrt(xi);
-            double rr_rez = 1 / rr;
 
-            // Unit vectors
-            double ex = dx * rr_rez;
-            double ey = dy * rr_rez;
-            double ez = dz * rr_rez;
 
-            double dvx = p1.vx() - p2.vx();
-            double dvy = p1.vy() - p2.vy();
-            double dvz = p1.vz() - p2.vz();
+            Eigen::Vector3d dv = p1.rtd1 - p2.rtd1;
 
-            Eigen::Vector3d n = {ex, ey, ez};
 
-            Eigen::Vector3d v1 = p1.rtd1;
-            Eigen::Vector3d v2 = p2.rtd1;
-            Eigen::Vector3d omega1 = p1.rot1;
-            Eigen::Vector3d omega2 = p2.rot2;
-            Eigen::Vector3d vrel = v1 - v2 - (r1*omega1 + r2*omega2).cross(n);
+//            Eigen::Vector3d n = dr.normalized();
+            Eigen::Vector3d n = dr / rr;
+
+            Eigen::Vector3d vrel = dv - (r1*p1.rot1 + r2*p2.rot1).cross(n);
             Eigen::Vector3d vtrel = vrel - vrel.dot(n)*n;
-            double vtrel_size = vtrel.norm();
-            Eigen::Vector3d t;
-            if (vtrel_size > 0){
-                t = vtrel * (1/vtrel_size);
-            }
-            else{
-                t = {0, 0, 0};
-            }
+            Eigen::Vector3d t = vtrel.normalized();
 
             // Update the contacts
             if (p1.particle_contacts.find(p2.index) == p1.particle_contacts.end()){
@@ -65,7 +50,8 @@ bool force(Particle &p1, Particle &p2, double lx, double ly, double lz, double t
                 p1.particle_contacts[p2.index] += vtrel*timestep;
             }
 
-            double xidot = -(ex * dvx + ey * dvy + ez*dvz);
+
+            double xidot = -(n.dot(dv));
 
             double gamma = p1._tangential_damping;
 
@@ -114,7 +100,8 @@ bool force(Particle &p, Particle &b, BasePlate &basePlate, double timestep) {
     double dy = p.y() - b.y();
     double dz = p.z() - (basePlate.z()+b.z());
     if (std::abs(dx) < p.r() + b.r() && std::abs(dy) < p.r() + b.r() && std::abs(dz) < p.r() + b.r()) {
-        double rr = sqrt(dx*dx + dy*dy + dz*dz);
+        Eigen::Vector3d dr = {dx, dy, dz};
+        double rr = dr.norm();
         double r1 = p.r();
         double r2 = b.r();
 
@@ -130,24 +117,11 @@ bool force(Particle &p, Particle &b, BasePlate &basePlate, double timestep) {
             double force_constant = 2*Y*sqrt(r1)/(3*(1-poisson*poisson));
             double sqrt_xi = sqrt(xi);
 
-            // Unit vectors
-            double rr_rez = 1/rr;
-            double ex = dx * rr_rez;
-            double ey = dy * rr_rez;
-            double ez = dz * rr_rez;
+            Eigen::Vector3d dv = p.rtd1 - Eigen::Vector3d(0, 0, basePlate.vz());
 
-            // Relative velocities
-            double dvx = p.vx();
-            double dvy = p.vy();
-            double dvz = p.vz() - basePlate.vz();
-
-            Eigen::Vector3d n = {ex, ey, ez};
-
-            Eigen::Vector3d v1 = p.rtd1;
-            Eigen::Vector3d v2 = {0, 0, basePlate.vz()};
-            Eigen::Vector3d omega1 = p.rot1;
-            Eigen::Vector3d omega2 = {0, 0, 0};
-            Eigen::Vector3d vrel = v1 - v2 -  (r1*omega1).cross(n);
+//            Eigen::Vector3d n = dr.normalized();
+            Eigen::Vector3d n = dr / rr;
+            Eigen::Vector3d vrel = dv -  (r1*p.rot1).cross(n);
             Eigen::Vector3d vtrel = vrel - vrel.dot(n)*n;
 
             // Update the contacts
@@ -159,17 +133,9 @@ bool force(Particle &p, Particle &b, BasePlate &basePlate, double timestep) {
                 p.base_contacts[b.index] += vtrel*timestep;
             }
 
+            Eigen::Vector3d t = vtrel.normalized();
 
-            double vtrel_size = vtrel.norm();
-            Eigen::Vector3d t;
-            if (vtrel_size > 0){
-                t = vtrel * (1/vtrel_size);
-            }
-            else{
-                t = {0, 0, 0};
-            }
-
-            double xidot = -(ex * dvx + ey * dvy + ez*dvz);
+            double xidot = -n.dot(dv);
             double gamma = 0.5*(p._tangential_damping+b._tangential_damping);
 
             // Normal forces
