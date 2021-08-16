@@ -43,6 +43,7 @@ void Engine::dump(bool first) {
     if (!_options.programOptions.dump_separate){
         dump_base(f1);
     }
+    std::fflush(f1);
 
     if (first){
         if (_options.programOptions.dump_separate){
