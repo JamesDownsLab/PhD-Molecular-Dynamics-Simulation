@@ -256,8 +256,8 @@ void Engine::add_particles() {
     double r = _options.ballProps.radius;
     double dx = 2*r;
     double dy = 2*r*sqrt(3.0)/2.0;
-    int nx = floor(lx / dx);
-    int ny = floor(ly / dy);
+    int nx = floor(lx / dx) - 1;
+    int ny = floor(ly / dy) - 1;
 
     std::random_device rd;
     std::default_random_engine eng(rd());
