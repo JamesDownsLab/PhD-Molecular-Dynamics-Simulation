@@ -285,8 +285,8 @@ void Engine::add_base_particles() {
     double dx = 2*r;
     double dy = 2*r*sqrt(3.0)/2.0;
 
-    int nx = ceil(lx / dx);
-    int ny = ceil(ly / dy);
+    int nx = floor(lx / dx);
+    int ny = floor(ly / dy);
     size_t index = 0;
     for (int i{0}; i < nx; i++){
         for (int j{0}; j < ny; j++){
