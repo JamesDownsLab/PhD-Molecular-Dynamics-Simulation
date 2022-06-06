@@ -288,8 +288,8 @@ void Engine::add_base_particles() {
     int nx = floor(lx / dx);
     int ny = floor(ly / dy);
     size_t index = 0;
-    for (int i{0}; i < nx; i++){
-        for (int j{0}; j < ny; j++){
+    for (int i{0}; i <= nx; i++){
+        for (int j{0}; j <= ny; j++){
             double x = double(i)*dx + double(j%2)*dx/2.0;
             double y = double(j)*dy;
             double z = _options.systemProps.base_height;

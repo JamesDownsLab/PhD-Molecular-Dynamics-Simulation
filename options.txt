@@ -5,8 +5,8 @@
 #save_interval: 1000
 #experiment: stable
 #dump_separate: 1
-#lx: 0.024
-#ly: 0.0208
+#lx: 0.048
+#ly: 0.0416
 #lz: 0.02
 #area_fraction: 0.8
 #base_height: 0.001
