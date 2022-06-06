@@ -118,6 +118,9 @@ Options read_input_file(const char* fname){
         else if (type == "#ramp_rate:"){
             stream >> programOptions.ramp_rate;
         }
+        else if (type == "#csv_savepath:"){
+            stream >> programOptions.csvSavePath;
+        }
         else {
             std::cout << "Unknown type: " << type << std::endl;
         }

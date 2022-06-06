@@ -11,6 +11,8 @@ Engine::Engine(Options& options)
     begin = std::chrono::steady_clock::now();
     timestep = options.programOptions.timestep;
     f1 = fopen(_options.programOptions.savepath.string().c_str(), "w");
+    f3 = fopen(_options.programOptions.csvSavePath.string().c_str(), "w");
+    dump_csv_header(f3);
     if (_options.programOptions.dump_separate){
         f2 = fopen(_options.programOptions.savepathbase.string().c_str(), "w");
     }
@@ -40,6 +42,7 @@ void Engine::dump(bool first) {
 
     dump_preamble(f1, true, !_options.programOptions.dump_separate);
     dump_particles(f1);
+    dump_particle_to_csv(f3);
     if (!_options.programOptions.dump_separate){
         dump_base(f1);
     }
@@ -66,9 +69,19 @@ void Engine::dump_preamble(std::FILE *f, bool inc_particles, bool inc_base_parti
     std::fprintf(f, "ITEM: ATOMS x y z vx vy vz radius type\n");
 }
 
+void Engine::dump_csv_header(std::FILE *f) const {
+    std::fprintf(f, "frame,x,y,z,vx,vy,vz,radius,type\n");
+}
+
 void Engine::dump_particles(std::FILE *f) {
     for (Particle& p : particles) {
         std::fprintf(f, "%.9f %.9f %.9f %.9f %.9f %.9f %.9f %d\n", p.x(), p.y(), p.z(), p.vx(), p.vy(), p.vz(), p.r(), 0);
+    }
+}
+
+void Engine::dump_particle_to_csv(std::FILE *f) {
+    for (Particle& p : particles){
+        std::fprintf(f, "%d, %.9f, %.9f, %.9f, %.9f, %.9f, %.9f, %.9f, %d\n", int(Time/timestep), p.x(), p.y(), p.z(), p.vx(), p.vy(), p.vz(), p.r(), 0);
     }
 }
 
@@ -385,3 +398,7 @@ void Engine::adjust_box_dimensions() {
     std::cout << "Ny: " << ny << std::endl;
     ly = dy * ny;
 }
+
+
+
+
