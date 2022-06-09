@@ -139,6 +139,7 @@ private:
     double timestep{0};
 
     double Time{0};
+    unsigned int step_number{0};
     Eigen::Vector3d G{0, 0, -9.81};
     BasePlate basePlate{0, 0, 0};
     double lx;

@@ -70,7 +70,7 @@ void Engine::dump_preamble(std::FILE *f, bool inc_particles, bool inc_base_parti
 }
 
 void Engine::dump_csv_header(std::FILE *f) const {
-    std::fprintf(f, "frame,x,y,z,vx,vy,vz,radius,type\n");
+    std::fprintf(f, "frame,particle,time,x,y,z,vx,vy,vz,radius,type\n");
 }
 
 void Engine::dump_particles(std::FILE *f) {
@@ -80,8 +80,10 @@ void Engine::dump_particles(std::FILE *f) {
 }
 
 void Engine::dump_particle_to_csv(std::FILE *f) {
+    int p_n{0};
     for (Particle& p : particles){
-        std::fprintf(f, "%d, %.9f, %.9f, %.9f, %.9f, %.9f, %.9f, %.9f, %d\n", int(Time/timestep), p.x(), p.y(), p.z(), p.vx(), p.vy(), p.vz(), p.r(), 0);
+        std::fprintf(f, "%d,%d,%.9f,%.9f,%.9f,%.9f,%.9f,%.9f,%.9f,%.9f,%d\n", step_number, p_n, Time, p.x(), p.y(), p.z(), p.vx(), p.vy(), p.vz(), p.r(), 0);
+        p_n++;
     }
 }
 
@@ -129,6 +131,7 @@ void Engine::integrate() {
                   [&](Particle& p) {p.periodic_bc(0, 0, lx, ly);});
 
     Time += timestep;
+    step_number++;
 }
 
 
