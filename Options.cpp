@@ -121,6 +121,9 @@ Options read_input_file(const char* fname){
         else if (type == "#csv_savepath:"){
             stream >> programOptions.csvSavePath;
         }
+        else if (type == "#save_delay:"){
+            stream >> programOptions.save_delay;
+        }
         else {
             std::cout << "Unknown type: " << type << std::endl;
         }

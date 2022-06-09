@@ -1,9 +1,10 @@
 #savepath: data_output.dump
 #savepath_base: data_output_base.dump
 #csv_savepath: data_output.csv
+#save_delay: 300000
 #timestep: 1e-5
-#steps: 1000000
-#save_interval: 100
+#steps: 400000
+#save_interval: 1
 #experiment: stable
 #dump_separate: 1
 #lx: 0.192

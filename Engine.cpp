@@ -40,13 +40,16 @@ void Engine::dump(bool first) {
         << "Timestep : " << Time/timestep << "\t"
         << "Elapsed time: " << std::chrono::duration_cast<std::chrono::seconds>(now-begin).count() << "s" << std::endl;
 
-    dump_preamble(f1, true, !_options.programOptions.dump_separate);
-    dump_particles(f1);
-    dump_particle_to_csv(f3);
+    if (step_number >= _options.programOptions.save_delay) {
+        dump_preamble(f1, true, !_options.programOptions.dump_separate);
+        dump_particles(f1);
+        dump_particle_to_csv(f3);
+    }
     if (!_options.programOptions.dump_separate){
         dump_base(f1);
     }
     std::fflush(f1);
+    std::fflush(f3);
 
     if (first){
         if (_options.programOptions.dump_separate){
@@ -258,12 +261,21 @@ void Engine::make_plate_forces() {
 }
 
 void Engine::check_dump() {
-    if (save != _options.programOptions.save_interval) {
-        save++;
+    if (step_number <= _options.programOptions.save_delay){
+        if (save != 1000){
+            save++;
+        } else {
+            save = 1;
+            dump(false);
+        }
     }
     else {
-        save = 1;
-        dump(false);
+        if (save != _options.programOptions.save_interval) {
+            save++;
+        } else {
+            save = 1;
+            dump(false);
+        }
     }
 }
 

@@ -15,6 +15,7 @@ struct ProgramOptions {
     std::filesystem::path csvSavePath{""};
     int steps{0};
     int save_interval{0};
+    int save_delay{0};
     double timestep{0};
     std::string experiment{""};
     double amplitude;
