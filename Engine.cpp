@@ -42,7 +42,9 @@ void Engine::dump(bool first) {
 
     if (step_number >= _options.programOptions.save_delay) {
         dump_preamble(f1, true, !_options.programOptions.dump_separate);
-        dump_particles(f1);
+        if (save == _options.programOptions.dump_interval) {
+            dump_particles(f1);
+        }
         dump_particle_to_csv(f3);
     }
     if (!_options.programOptions.dump_separate){
@@ -273,8 +275,9 @@ void Engine::check_dump() {
         if (save != _options.programOptions.save_interval) {
             save++;
         } else {
-            save = 1;
+
             dump(false);
+            save = 1;
         }
     }
 }

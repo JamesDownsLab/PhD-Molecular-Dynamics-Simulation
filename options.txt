@@ -10,12 +10,12 @@
 #lx: 0.192
 #ly: 0.1664
 #lz: 0.02
-#area_fraction: 0.85
+#area_fraction: 0.9
 #base_height: 0.001
 #ball_height: 0.0051
 #dimple_spacing: 4.8e-3
 #dimple_radius: 1e-3
-#dimple_depth: 0.5e-3
+#dimple_depth: 0.5e-5
 #ball_radius: 2e-3
 #ball_mass: 3.87e-5
 #ball_youngs: 5e3
@@ -29,7 +29,7 @@
 #base_youngs: 5e8
 #base_poisson: 0.3
 #base_damping: 0.1
-#amplitude: 4e-4
-#amplitude_start: 4e-4
+#amplitude: 3.5e-4
+#amplitude_start: 3.5e-4
 #amplitude_end: 2e-4
 #ramp_rate: 2e-6

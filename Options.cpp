@@ -25,6 +25,9 @@ Options read_input_file(const char* fname){
         else if (type == "#save_interval:"){
             stream >> programOptions.save_interval;
         }
+        else if (type == "#dump_interval:"){
+            stream >> programOptions.dump_interval;
+        }
         else if (type == "#timestep:"){
             stream >> programOptions.timestep;
         }

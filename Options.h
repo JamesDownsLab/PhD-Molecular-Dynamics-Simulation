@@ -16,6 +16,7 @@ struct ProgramOptions {
     int steps{0};
     int save_interval{0};
     int save_delay{0};
+    int dump_interval{0};
     double timestep{0};
     std::string experiment{""};
     double amplitude;
