@@ -5,6 +5,7 @@
 #timestep: 1e-5
 #steps: 400000
 #save_interval: 1
+#dump_interval: 500
 #experiment: stable
 #dump_separate: 1
 #lx: 0.192

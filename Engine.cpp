@@ -41,10 +41,12 @@ void Engine::dump(bool first) {
         << "Elapsed time: " << std::chrono::duration_cast<std::chrono::seconds>(now-begin).count() << "s" << std::endl;
 
     if (step_number >= _options.programOptions.save_delay) {
-        dump_preamble(f1, true, !_options.programOptions.dump_separate);
+
         if (save == _options.programOptions.dump_interval) {
+            dump_preamble(f1, true, !_options.programOptions.dump_separate);
             dump_particles(f1);
         }
+
         dump_particle_to_csv(f3);
     }
     if (!_options.programOptions.dump_separate){
