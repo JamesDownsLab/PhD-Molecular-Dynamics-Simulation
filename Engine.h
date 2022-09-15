@@ -115,6 +115,7 @@ private:
     void dump_base(std::FILE * f);
     void check_dump();
     int save{1};
+    int save_csv{1};
     std::FILE* f1;
     std::FILE* f2;
     std::FILE* f3;

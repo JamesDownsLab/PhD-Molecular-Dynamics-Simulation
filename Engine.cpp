@@ -42,12 +42,8 @@ void Engine::dump(bool first) {
 
     if (step_number >= _options.programOptions.save_delay) {
 
-        if (save == _options.programOptions.dump_interval) {
-            dump_preamble(f1, true, !_options.programOptions.dump_separate);
-            dump_particles(f1);
-        }
-
-        dump_particle_to_csv(f3);
+        dump_preamble(f1, true, !_options.programOptions.dump_separate);
+        dump_particles(f1);
     }
     if (!_options.programOptions.dump_separate){
         dump_base(f1);
@@ -277,9 +273,15 @@ void Engine::check_dump() {
         if (save != _options.programOptions.save_interval) {
             save++;
         } else {
-
             dump(false);
             save = 1;
+        }
+
+        if (save_csv != _options.programOptions.csv_interval){
+            save_csv++;
+        } else {
+            dump_particle_to_csv(f3);
+            save_csv = 1;
         }
     }
 }
